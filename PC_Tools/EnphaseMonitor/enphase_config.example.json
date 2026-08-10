@@ -1,0 +1,8 @@
+{
+  "envoy_host": "envoy.local",
+  "envoy_serial": "REMPLACER_PAR_LE_NUMERO_DE_SERIE_ENVOY",
+  "enlighten_user": "REMPLACER_PAR_VOTRE_EMAIL_ENLIGHTEN",
+  "enlighten_password": "REMPLACER_PAR_VOTRE_MOT_DE_PASSE_ENLIGHTEN",
+  "poll_interval_seconds": 5,
+  "web_port": 8080
+}

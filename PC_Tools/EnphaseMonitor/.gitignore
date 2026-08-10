@@ -1,0 +1,5 @@
+# Fichiers contenant des identifiants / secrets : ne jamais committer
+enphase_config.json
+enphase_config.json.bak
+enphase_token_cache.json
+__pycache__/
