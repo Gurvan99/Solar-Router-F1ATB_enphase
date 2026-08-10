@@ -1,4 +1,4 @@
-#define Version "17.25"  //
+#define Version "17.26"  //
 #define HOSTNAME "RMS-ESP32-"
 
 
@@ -320,6 +320,10 @@
     Retrait Tension et courant V17.22 car bugé.
   - Version 17.25
     Fourniture (nouvelle version) dans le message Source externe des tensions et courants pour la variante du programme adaptée aux Véhicules Electriques 
+  - Version 17.26
+    Support d'un nom d'hôte pour le serveur MQTT (en plus de l'IP), nécessaire pour se connecter à un broker MQTT cloud (ex. HiveMQ Cloud, EMQX Cloud) qui n'a pas d'IP fixe.
+    Support de la connexion MQTT chiffrée TLS (port 8883), requis par la plupart des brokers cloud pour le pilotage à distance.
+    Ajout d'un projet PlatformIO (platformio.ini) permettant de compiler ce sketch depuis VS Code, en alternative à l'Arduino IDE.
 
  
 
@@ -444,6 +448,8 @@ unsigned long RMSextIP = 0;
 unsigned int MQTTRepet = 0;
 unsigned long MQTTIP = 0;
 unsigned int MQTTPort = 1883;
+String MQTTHost = "";  // Nom d'hôte du broker MQTT (ex. broker cloud) - prioritaire sur MQTTIP si renseigné
+byte MQTTTLS = 0;      // Connexion MQTT chiffrée TLS (obligatoire pour la plupart des brokers cloud, port 8883)
 String MQTTUser = "User";
 String MQTTPwd = "password";
 String MQTTPrefix = "homeassistant";  // prefix obligatoire pour l'auto-discovery entre HA et Core-Mosquitto (par défaut c'est homeassistant)
@@ -833,7 +839,8 @@ String TopicT[4];
 String AllTemp = "";
 
 //MQTT
-WiFiClient MqttClient;
+WiFiClient MqttClient;              // client MQTT non chiffré (LAN / broker local)
+WiFiClientSecure MqttClientSecure;  // client MQTT chiffré TLS (broker cloud, port 8883 typiquement)
 PubSubClient clientMQTT(MqttClient);
 bool Discovered = false;
 

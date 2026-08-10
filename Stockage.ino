@@ -315,6 +315,8 @@ void DeserializeConfiguration(String json) {
   EnphaseSerial = conf["EnphaseSerial"].as<String>();
   MQTTRepet = conf["MQTTRepet"];
   MQTTIP = conf["MQTTIP"];
+  MQTTHost = conf["MQTTHost"].as<String>();
+  MQTTTLS = conf["MQTTTLS"].isNull() ? MQTTTLS : conf["MQTTTLS"];
   MQTTPort = conf["MQTTPort"];
   MQTTUser = conf["MQTTUser"].as<String>();
   MQTTPwd = conf["MQTTPwd"].as<String>();
@@ -452,6 +454,8 @@ String SerializeConfiguration() {
   }
   conf["MQTTRepet"] = MQTTRepet;
   conf["MQTTIP"] = MQTTIP;
+  conf["MQTTHost"] = MQTTHost;
+  conf["MQTTTLS"] = MQTTTLS;
   conf["MQTTPort"] = MQTTPort;
   conf["MQTTUser"] = MQTTUser;
   conf["MQTTPwd"] = MQTTPwd;

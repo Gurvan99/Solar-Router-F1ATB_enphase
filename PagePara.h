@@ -426,8 +426,18 @@ const char *ParaHtml = R"====(
       <div class="form">
 
         <div class="ligne">
-          <label for="MQTTIP">Adresse IP host MQTT :</label>
+          <label for="MQTTHost">Nom d'hôte MQTT <small>(broker cloud, prioritaire sur l'IP)</small> :</label>
+          <input type="text" id="MQTTHost" name="MQTTHost" placeholder="ex. xxxx.s1.eu.hivemq.cloud">
+        </div>
+
+        <div class="ligne">
+          <label for="MQTTIP">Adresse IP host MQTT <small>(repli si pas de nom d'hôte)</small> :</label>
           <input type="text" id="MQTTIP" name="MQTTIP">
+        </div>
+
+        <div class="ligne">
+          <label for="MQTTTLS">Connexion chiffrée TLS <small>(obligatoire pour un broker cloud, port 8883)</small> :</label>
+          <input type="checkbox" id="MQTTTLS" name="MQTTTLS" style="width:25px;">
         </div>
 
         <div class="ligne">

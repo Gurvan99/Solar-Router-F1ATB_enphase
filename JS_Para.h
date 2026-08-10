@@ -116,6 +116,8 @@ function SetParaFixe() {
     GID("TopicP").value = F.TopicP;
     GID("MQTTRepet").value = F.MQTTRepet;
     GID("MQTTIP").value = int2ip(F.MQTTIP);
+    GID("MQTTHost").value = F.MQTTHost;
+    GID("MQTTTLS").checked = F.MQTTTLS == 1;
     GID("MQTTPort").value = F.MQTTPort;
     GID("MQTTUser").value = F.MQTTUser;
     GID("MQTTPwd").value = F.MQTTPwd;
@@ -212,6 +214,8 @@ function SendValues() {
 
   F.MQTTRepet = GID("MQTTRepet").value;
   F.MQTTIP = ip2int(GID("MQTTIP").value);
+  F.MQTTHost = GID("MQTTHost").value.trim();
+  F.MQTTTLS = GID("MQTTTLS").checked ? 1 : 0;
   F.MQTTPort = GID("MQTTPort").value;
   F.MQTTUser = GID("MQTTUser").value.trim();
   F.MQTTPwd = GID("MQTTPwd").value.trim();
@@ -243,7 +247,8 @@ function SendValues() {
   }
   
   document.cookie = "CleAcces=" + encodeURIComponent(F.CleAccesRef) + ";max-age=31536000;path=/"; // Ajout de la durée et du chemin
-  if ((GID("dhcp").checked || checkIP("adrIP") && checkIP("gateway")) && (!GID("MQTTRepet").checked || checkIP("MQTTIP"))) {
+  // Si un nom d'hôte MQTT est renseigné (broker cloud), l'IP MQTT devient facultative (repli legacy).
+  if ((GID("dhcp").checked || checkIP("adrIP") && checkIP("gateway")) && (!GID("MQTTRepet").checked || GID("MQTTHost").value.trim().length > 0 || checkIP("MQTTIP"))) {
     fetch("/ParaNew", {
       method: "POST",                     // méthode HTTP
       headers: {

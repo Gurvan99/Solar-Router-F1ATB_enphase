@@ -37,7 +37,9 @@ bool testMQTTconnected() {
   bool connecte = true;
   if (!clientMQTT.connected()) {  // si le mqtt n'est pas connecté (utile aussi lors de la 1ere connexion)
     TelnetPrintln("Connection au serveur MQTT ...");
-    String host = IP2String(MQTTIP);
+    // Priorité au nom d'hôte (obligatoire pour un broker cloud, sans IP fixe garantie),
+    // repli sur l'IP historique (MQTTIP) pour rester compatible avec les configs existantes.
+    String host = (MQTTHost.length() > 0) ? MQTTHost : IP2String(MQTTIP);
     String S = "";
     if (MQTTPrefix != "")
       S = MQTTPrefix + "/";
@@ -48,6 +50,12 @@ bool testMQTTconnected() {
     snprintf(PrefixMQTTEtat, sizeof(PrefixMQTTEtat), "%s", S.c_str());
     String TopicA = "Available";
     snprintf(AvailableTopic, sizeof(AvailableTopic), "%s%s/%s", PrefixMQTTEtat, MQTTdeviceName.c_str(), TopicA.c_str());
+    if (MQTTTLS == 1) {
+      MqttClientSecure.setInsecure();  // skip verification, comme pour Enphase/RTE ailleurs dans le code
+      clientMQTT.setClient(MqttClientSecure);
+    } else {
+      clientMQTT.setClient(MqttClient);
+    }
     clientMQTT.setServer(host.c_str(), MQTTPort);
     clientMQTT.setCallback(callback);                                                                                         // Déclaration de la fonction de souscription
     if (clientMQTT.connect(MQTTdeviceName.c_str(), MQTTUser.c_str(), MQTTPwd.c_str(), AvailableTopic, 2, true, "offline")) {  // si l'utilisateur est connecté au mqtt
