@@ -56,6 +56,8 @@ function CreerAction(NumAction, Titre) {
                     ONouvre :100,
                     Tinf: 1600,
                     Tsup: 1600,
+                    TinfForce: 1600,
+                    TsupForce: 1600,
                     Hmin: 0,
                     Hmax: 0,
                     CanalTemp: -1,
@@ -254,7 +256,17 @@ function TracePeriodes(iAct) {
             TxtTarif = `<div>${tarifText}</div>`;
         }
         
-        const condition = (temperature !== "" || H_Ouvert !== "" || TxtTarif !== "") ? "<div>Condition(s) :</div>" + temperature + H_Ouvert + TxtTarif : "";
+        // Sécurité température (forçage 100% en mode Routage relais)
+        let secuTemp = "";
+        if (iAct > 0 && Type === 3) {
+            const TinfForce = periode.TinfForce;
+            const TsupForce = periode.TsupForce;
+            if (TinfForce >= -500 && TinfForce <= 1500 && TsupForce >= -500 && TsupForce <= 1500) {
+                secuTemp = `<div>Force 100% si T&le;${TinfForce / 10}° (retour T&ge;${TsupForce / 10}°)</div>`;
+            }
+        }
+
+        const condition = (temperature !== "" || H_Ouvert !== "" || TxtTarif !== "" || secuTemp !== "") ? "<div>Condition(s) :</div>" + temperature + H_Ouvert + TxtTarif + secuTemp : "";
         let TexteMinMax = "";
 
         // Détermination du contenu de la zone d'info en fonction du type d'action/période
@@ -484,6 +496,8 @@ function AddSub(v, iAct) {
                 ONouvre : 100,
                 Tinf: 1600,
                 Tsup: 1600,
+                TinfForce: 1600,
+                TsupForce: 1600,
                 Hmin: 0,
                 Hmax: 0,
                 CanalTemp: -1,
@@ -559,9 +573,13 @@ function infoZclicK(i, iAct) {
         const Vmax = periode.Vmax;
         const Tinf = periode.Tinf;
         const Tsup = periode.Tsup;
+        const TinfForce = periode.TinfForce;
+        const TsupForce = periode.TsupForce;
         
         let TinfC = Tinf / 10;
         let TsupC = Tsup / 10;
+        let TinfForceC = TinfForce / 10;
+        let TsupForceC = TsupForce / 10;
         
         const Hmin = (periode.Hmin > 0) ? Hdeci2Hmn(periode.Hmin) : "";
         const Hmax = (periode.Hmax > 0) ? Hdeci2Hmn(periode.Hmax) : "";
@@ -571,6 +589,8 @@ function infoZclicK(i, iAct) {
         // Vider si hors de la plage -50.0 à 150.0
         if (Tinf > 1500 || Tinf < -500) TinfC = ""; 
         if (Tsup > 1500 || Tsup < -500) TsupC = ""; 
+        if (TinfForce > 1500 || TinfForce < -500) TinfForceC = "";
+        if (TsupForce > 1500 || TsupForce < -500) TsupForceC = "";
 
         if (iAct > 0) {
             // Mode Routage ON/OFF ou Multi/Train de sinus
@@ -625,6 +645,16 @@ function infoZclicK(i, iAct) {
             S += "<div class='minmax'><div>T &ge;<input id='T_sup_" + idZ + "' type='number' value='" + TsupC + "' onchange='NewVal(this)' title='Définir la ou les températures qui permettent l&apos;activation de la fonction On ou Routage.'>°</div>";
             S += "<div>T &le;<input id='T_inf_" + idZ + "' type='number' value='" + TinfC + "' onchange='NewVal(this)'>°</div></div>";
             S += "<div><small>T en degré (-50.0 à 150.0) ou laisser vide</small></div>";
+            S += "</div>";
+        }
+
+        // Sécurité température en mode Routage (relais SSR) : force 100% si T trop basse, hystérésis de retour
+        if (capteurT && iAct > 0 && Type === 3) {
+            S += "<div class='bord1px'>";
+            S += "<div class='TitZone'>&nbsp;&nbsp;&nbsp;Sécurité : forcer 100% si température basse</div>";
+            S += "<div class='minmax'><div>Forcer si T &le;<input id='TF_inf_" + idZ + "' type='number' value='" + TinfForceC + "' onchange='NewVal(this)' title='En dessous de ce seuil, le Routage est suspendu et la sortie est forcée à 100% (Ouverture Force).'>°</div>";
+            S += "<div>Revient au Routage si T &ge;<input id='TF_sup_" + idZ + "' type='number' value='" + TsupForceC + "' onchange='NewVal(this)' title='Le retour au Routage normal ne se fait que quand la température remonte à ce niveau (hystérésis, évite les oscillations).'>°</div></div>";
+            S += "<div><small>T en degré (-50.0 à 150.0) ou laisser vide (sécurité désactivée)</small></div>";
             S += "</div>";
         }
         
@@ -746,6 +776,14 @@ function NewVal(t) {
         }
     } else if (champs[0].indexOf("ouvre") > 0) { // Ouverture ON
         periode.ONouvre = Math.floor(value);
+    } else if (champs[0].indexOf("TF_inf") >= 0) { // Sécurité Routage : TinfForce (force 100% si T <= ce seuil)
+        let V = value;
+        if (V === "") V = 158;
+        periode.TinfForce = Math.floor(parseFloat(V) * 10);
+    } else if (champs[0].indexOf("TF_sup") >= 0) { // Sécurité Routage : TsupForce (retour au routage si T >= ce seuil)
+        let V = value;
+        if (V === "") V = 158;
+        periode.TsupForce = Math.floor(parseFloat(V) * 10);
     } else if (champs[0].indexOf("inf") > 0) { // Température inférieure (Tinf)
         let V = value;
         if (V === "") V = 158; 

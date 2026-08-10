@@ -41,6 +41,8 @@ Action::Action(int aIdx) {
     ONouvre[i] = 100;
     Tinf[i] = -1600;  //Temperarure * 10
     Tsup[i] = -1600;
+    TinfForce[i] = -1600;  //Sécurité Routage désactivée par défaut
+    TsupForce[i] = -1600;
     Hmin[i] = 0;  //Heure deci *100 Min pour actif. 0=non utilisé
     Hmax[i] = 0;  //Heure deci *100 Max pour actif
     CanalTemp[i] = -1;
@@ -147,6 +149,17 @@ Action::ParaPeriode Action::ParaEnCours(int Heure, float Temperature, int Ltarfb
       P.Vmin = Vmin[i];
       P.Vmax = Vmax[i];
       if (P.Type==2) P.Vmax=ONouvre[i] ;
+
+      //Sécurité température en mode Routage relais (Type PW) : force l'ouverture à 100% si T <= TinfForce,
+      //reste forcé (hystérésis) tant que T n'est pas remontée à TsupForce
+      if (Type[i] == 3 && Temperature > -100.0 && TinfForce[i] > -1500 && TsupForce[i] > -1500 && TinfForce[i] < TsupForce[i]) {
+        if (Tempx10 <= TinfForce[i]) TseuilForce = TsupForce[i];  //Arme le forçage, seuil de sortie = TsupForce
+        if (Tempx10 >= TsupForce[i]) TseuilForce = -2000;         //Désarme le forçage
+        if (TseuilForce > -2000 && Tempx10 < TseuilForce) {
+          P.Type = 2;  //Force On prioritaire sur le Routage (sécurité température)
+          P.Vmax = ForceOuvre;
+        }
+      }
     }
   }
 
@@ -183,6 +196,16 @@ byte Action::TypeEnCours(int Heure, float Temperature, int Ltarfbin, int Retard)
         if (O_on[i] != 0 && ((int(O_on[i]) > ExtOuvert && Retard == 100) || ExtValide == 0)) ConditionsOk = false;   //Inferieur au seuil haut et pas encore ouvert
       }
       if (ConditionsOk) S = Type[i];
+
+      //Sécurité température en mode Routage relais (Type PW) : force l'ouverture à 100% si T <= TinfForce,
+      //reste forcé (hystérésis) tant que T n'est pas remontée à TsupForce
+      if (Type[i] == 3 && Temperature > -100.0 && TinfForce[i] > -1500 && TsupForce[i] > -1500 && TinfForce[i] < TsupForce[i]) {
+        if (Tempx10 <= TinfForce[i]) TseuilForce = TsupForce[i];  //Arme le forçage, seuil de sortie = TsupForce
+        if (Tempx10 >= TsupForce[i]) TseuilForce = -2000;         //Désarme le forçage
+        if (TseuilForce > -2000 && Tempx10 < TseuilForce) {
+          S = 2;  //Force On prioritaire sur le Routage (sécurité température)
+        }
+      }
     }
   }
 

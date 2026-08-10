@@ -390,6 +390,8 @@ void DeserializeConfiguration(String json) {
       LesActions[iAct].ONouvre[i] = !objP["ONouvre"].isNull() ? objP["ONouvre"] : 100;
       LesActions[iAct].Tinf[i] = objP["Tinf"];
       LesActions[iAct].Tsup[i] = objP["Tsup"];
+      LesActions[iAct].TinfForce[i] = !objP["TinfForce"].isNull() ? objP["TinfForce"] : -1600;
+      LesActions[iAct].TsupForce[i] = !objP["TsupForce"].isNull() ? objP["TsupForce"] : -1600;
       LesActions[iAct].Hmin[i] = objP["Hmin"];
       LesActions[iAct].Hmax[i] = objP["Hmax"];
       LesActions[iAct].CanalTemp[i] = objP["CanalTemp"] | 0;
@@ -526,6 +528,8 @@ String SerializeConfiguration() {
       objP["ONouvre"] = LesActions[iAct].ONouvre[i];
       objP["Tinf"] = LesActions[iAct].Tinf[i];
       objP["Tsup"] = LesActions[iAct].Tsup[i];
+      objP["TinfForce"] = LesActions[iAct].TinfForce[i];
+      objP["TsupForce"] = LesActions[iAct].TsupForce[i];
       objP["Hmin"] = LesActions[iAct].Hmin[i];
       objP["Hmax"] = LesActions[iAct].Hmax[i];
       objP["CanalTemp"] = LesActions[iAct].CanalTemp[i];

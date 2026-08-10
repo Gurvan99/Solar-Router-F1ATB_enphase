@@ -8,6 +8,7 @@ private:
   int T_LastAction = 0;
   int tempoTimer = 0;
   int16_t Tseuil = 2000;
+  int16_t TseuilForce = -2000;  //Latch hystérésis pour le forçage sécurité température (Routage)
 
 
 
@@ -64,6 +65,8 @@ public:
   byte ONouvre[8];  //Ouverture max à ON forcé
   int16_t Tinf[8];  //Temperarure * 10
   int16_t Tsup[8];
+  int16_t TinfForce[8];  //Sécurité Routage : force 100% si T <= ce seuil (Temperature * 10, -1600 = non utilisé)
+  int16_t TsupForce[8];  //Sécurité Routage : revient au routage normal si T >= ce seuil (Temperature * 10, -1600 = non utilisé)
   int16_t Hmin[8];  //Heure deci *100 Min pour actif. 0=non utilisé
   int16_t Hmax[8];  //Heure deci *100 Max pour actif
   int16_t CanalTemp[8];
