@@ -74,5 +74,59 @@ Routeur photovoltaïque basé sur **ESP32**, permettant d’optimiser l’autoco
 
 1. **Cloner le dépôt**
    ```bash
-   git clone https://github.com/F1ATB/Solar-Router-F1ATB.git
-   cd Routeur-Photovoltaique-F1ATB
+   git clone https://github.com/Gurvan99/Solar-Router-F1ATB_enphase.git
+   cd Solar-Router-F1ATB_enphase
+   git checkout optimise-enphase-envoy
+   ```
+
+---
+
+## 🛠️ Compiler le firmware
+
+Le dépôt est un sketch Arduino classique (fichiers `.ino`/`.h`/`.cpp` à la racine). Deux méthodes de compilation sont possibles.
+
+### Option recommandée : PlatformIO (VS Code ou ligne de commande)
+
+Un projet PlatformIO (`platformio.ini`) est fourni à la racine du dépôt, il compile directement les fichiers existants sans rien déplacer.
+
+**Pré-requis (à faire une seule fois par PC) :**
+1. **Python ≥ 3.10** (3.10, 3.11, 3.12, 3.13 ou 3.14). PlatformIO ne fonctionne pas avec Python 3.8/3.9.
+2. Installer PlatformIO :
+   ```powershell
+   python -m pip install -U platformio
+   ```
+   (sous Windows, si plusieurs versions de Python sont installées, utiliser explicitement la bonne, ex. `py -3.13 -m pip install -U platformio`)
+3. (Optionnel mais recommandé) Installer l'extension **PlatformIO IDE** dans VS Code, pour avoir la compilation/upload/monitor série intégrés à l'éditeur.
+
+**Compiler :**
+```powershell
+cd Solar-Router-F1ATB_enphase
+pio run              # compile le firmware (.pio/build/esp32dev/firmware.bin)
+pio run -t upload    # compile + flashe l'ESP32 connecté en USB
+pio device monitor    # ouvre le moniteur série
+```
+
+**Points d'attention repris dans `platformio.ini` :**
+- Le projet utilise le fork **pioarduino** de la plateforme `espressif32` (et non celle officielle de PlatformIO), car celle-ci est bloquée sur un ancien core Arduino-ESP32 (2.0.17) incompatible avec ce projet, qui nécessite un core **≥ 3.0.1**. Le premier `pio run` télécharge ce fork ainsi que tout le toolchain ESP32 (~plusieurs centaines de Mo, connexion internet nécessaire, peut prendre plusieurs minutes).
+- La table de partitions personnalisée (`partitions.csv`, déjà dans le dépôt) est utilisée via `board_build.partitions` — ne pas la remplacer par un schéma standard, sous peine de casser le Watchdog.
+- Le fichier `OneWire.cpp`/`OneWire.h` du dépôt est une version **modifiée** (pas la bibliothèque officielle) : `lib_ignore = OneWire` + `-I.` dans `build_flags` garantissent que c'est bien cette version qui est utilisée, pas celle installée automatiquement par PlatformIO pour `DallasTemperature`.
+- `board = esp32dev` est le réglage par défaut. À adapter si la carte cible est différente (ex. carte avec Ethernet type WT32-ETH01).
+
+### Alternative : Arduino IDE
+
+1. Installer l'[Arduino IDE](https://www.arduino.cc/en/software) (2.x recommandé).
+2. Ajouter l'URL du gestionnaire de cartes ESP32 : `Fichier > Préférences > URL de gestionnaire de cartes` → `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
+3. Installer le core **esp32 (Espressif Systems) ≥ 3.0.1** via le gestionnaire de cartes.
+4. Installer les bibliothèques manquantes via le gestionnaire de bibliothèques : `PubSubClient`, `DallasTemperature`, `ArduinoJson`, `UrlEncode`, `EthernetESP32`, `LovyanGFX`. (`OneWire` est fourni dans le dépôt, ne pas installer la version officielle en plus pour éviter un conflit de symboles.)
+5. Ouvrir `Solar_Router_V17_25.ino`.
+6. Sélectionner la carte ESP32 correspondant au matériel, puis dans `Outils > Partition Scheme`, sélectionner le schéma personnalisé issu de `partitions.csv` (**pas** un schéma standard, sinon le Watchdog est cassé).
+7. Vérifier/Compiler (`Ctrl+R`), puis Téléverser (`Ctrl+U`).
+
+### Ce qu'il faut refaire sur un nouveau PC
+
+- Installer Git, un Python ≥ 3.10 (pour PlatformIO) ou l'Arduino IDE.
+- Cloner le dépôt (voir ci-dessus).
+- Reconfigurer l'identité Git locale si besoin (`git config user.name`/`user.email`) — non versionnée, propre à chaque poste.
+- Le premier build PlatformIO retéléchargera toutes les dépendances (plateforme, toolchain, bibliothèques) : rien n'est committé dans `.pio/` (ignoré via `.gitignore`).
+- Les fichiers de configuration Enphase (`PC_Tools/EnphaseMonitor/enphase_config.json`, `enphase_token_cache.json`) contiennent des secrets et **ne sont pas versionnés** : à recréer localement à partir de `enphase_config.example.json` si l'outil PC est utilisé sur ce nouveau poste.
+- La configuration WiFi/MQTT/etc. du routeur lui-même n'est pas stockée dans le code : elle se fait depuis l'interface Web de l'ESP32 après le premier démarrage (ou via import/export JSON, voir menu Paramètres du routeur).
