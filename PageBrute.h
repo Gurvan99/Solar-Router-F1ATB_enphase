@@ -70,6 +70,7 @@ const char *PageBrute = R"====(
     #infoSmartG,
     #infoHomeW,
     #infoShellyEm,
+    #infoZendure,
     #infoPmqtt {
       display: none;
     }
@@ -160,6 +161,12 @@ const char *PageBrute = R"====(
   <div id="infoShellyEm">
     <div>Données Shelly Em</div>
     <div id="dataShellyEm" class="tableau dataIn"></div>
+  </div>
+
+  <!-- Zendure 3CT -->
+  <div id="infoZendure">
+    <div>Données Zendure 3CT</div>
+    <div id="dataZendure" class="tableau dataIn"></div>
   </div>
 
   <!-- MQTT -->

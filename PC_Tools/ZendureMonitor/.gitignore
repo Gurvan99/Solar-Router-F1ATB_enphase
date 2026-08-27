@@ -1,0 +1,4 @@
+# Fichier contenant l'IP réelle du compteur : ne jamais committer
+zendure_config.json
+*.bak
+__pycache__/

@@ -447,6 +447,17 @@ async function LoadData() {
                 GH('dataShellyEm', Ss);
                 break;
 
+            case "Zendure":
+                GID('infoZendure').style.display="block";
+                groupes[1] = groupes[1].replaceAll('"','');
+                var G1=groupes[1].split(",");
+                let Sz="";
+                for (var i=0;i<G1.length;i++){
+                      Sz +=G1[i]+"<br>";
+                }
+                GH('dataZendure', Sz);
+                break;
+
             case "UxIx3":
                 GID('infoUxIx3').style.display="block";
                 GH('dataUxIx3', groupes[1]);

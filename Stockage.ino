@@ -163,7 +163,7 @@ void RecordEnergieEncours(String date) { // pour permettre un re-démarrage corr
 // Lorsqu'on sait qu'EDF va couper, on peut anticiper en réalisant un reset un peu avant, de manière à préserver au mieux ces compteurs
 // Si ce n'est pas possible; on pourra toujours mettre à jour en sauvegardant et rechargeant EnergieMinuit.eng
 
-if ( (Source == "UxIx3") || (Source == "UxI") )
+if ( (Source == "UxIx3") || (Source == "UxI") || (Source == "Zendure") )
 // Ajout PhDV61 des compteurs totaux "M" pour ne pas perdre l'encours en cas de demande de reset ou de upload OTA 
 {
   conf["Energie_M_Soutiree_float"] = Energie_M_Soutiree_double;
@@ -231,6 +231,11 @@ void LectureConsoMatinJour(void) {
   else if (Source == "UxI")  
   {
      EASfloat = conf["Energie_M_Soutiree_float"]; 
+     EAIfloat = conf["Energie_M_Injectee_float"];
+  }
+  else if (Source == "Zendure")
+  {
+     EASfloat = conf["Energie_M_Soutiree_float"];  // Zendure 3CT intègre l'énergie logiciellement, comme UxI
      EAIfloat = conf["Energie_M_Injectee_float"];
   }
 

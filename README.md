@@ -106,6 +106,17 @@ pio run -t upload    # compile + flashe l'ESP32 connecté en USB
 pio device monitor    # ouvre le moniteur série
 ```
 
+**⚠️ Si plusieurs versions de Python sont installées sur le PC** (ex. un ancien Python 3.8 à côté
+d'un Python ≥3.10) : la commande `pio` du PATH peut être un raccourci généré par la mauvaise
+version de Python et échouer avec `ERROR: Python version must be 3.10, 3.11, 3.12, 3.13, 3.14.` —
+même si PlatformIO est bien installé par ailleurs pour une version compatible. Dans ce cas,
+invoquer PlatformIO explicitement via la bonne version de Python :
+```powershell
+py -3.13 -m platformio run
+py -3.13 -m platformio run -t upload
+py -3.13 -m platformio device monitor
+```
+
 **Points d'attention repris dans `platformio.ini` :**
 - Le projet utilise le fork **pioarduino** de la plateforme `espressif32` (et non celle officielle de PlatformIO), car celle-ci est bloquée sur un ancien core Arduino-ESP32 (2.0.17) incompatible avec ce projet, qui nécessite un core **≥ 3.0.1**. Le premier `pio run` télécharge ce fork ainsi que tout le toolchain ESP32 (~plusieurs centaines de Mo, connexion internet nécessaire, peut prendre plusieurs minutes).
 - La table de partitions personnalisée (`partitions.csv`, déjà dans le dépôt) est utilisée via `board_build.partitions` — ne pas la remplacer par un schéma standard, sous peine de casser le Watchdog.

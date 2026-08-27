@@ -31,10 +31,12 @@ build script, task runner, test suite, or linter in the repo.
   header declarations. `Solar_Router_V17_25.ino` is the entry point (`setup()`/`loop()`) and owns
   almost all global state (arrays, `Action` instances, timers, etc.).
 - **Runtime source selection, not compile-time**: all `Source_*.ino` files (Linky, UxI, UxIx2,
-  UxIx3/JSY, Enphase Envoy, Shelly EM/Pro EM, SmartG, HomeWizard, MQTT, external ESP, NotDef) are
-  always compiled in. Which one is active is decided at runtime by comparing the `Source` string
-  (loaded from config) in `if (Source == "...")` chains in `setup()` / `Task_LectureRMS()` in the
-  main `.ino` — each source exposes a `Setup_X()` and a `LectureX()` function called from there.
+  UxIx3/JSY, Enphase Envoy, Shelly EM/Pro EM, SmartG, HomeWizard, Zendure 3CT, MQTT, external ESP,
+  NotDef) are always compiled in. Which one is active is decided at runtime by comparing the
+  `Source` string (loaded from config) in `if (Source == "...")` chains in `setup()` /
+  `Task_LectureRMS()` in the main `.ino` — each source exposes a `Setup_X()` and a `LectureX()`
+  function called from there (some sources, like Zendure 3CT/HomeWizard/Shelly, need no `Setup_X()`
+  since they require no auth/init beyond the generic external IP field, `RMSextIP`).
   When adding a new measurement source, follow this pattern: new `Source_X.ino` file with
   `Setup_X()`/`LectureX()`, then wire it into the dispatch chains in the main sketch.
 - **Dual-core split**: measurement acquisition runs in `Task_LectureRMS()`, pinned to core 0 via

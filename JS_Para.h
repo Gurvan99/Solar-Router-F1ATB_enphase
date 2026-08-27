@@ -492,6 +492,9 @@ function AdaptationSource() {
                                  Triphasé 3EM-63 : voie = 63</div>`;
                                  
             break;
+        case 'Zendure':
+            txtExt = "Zendure 3CT";
+            break;
     }
     
     // Mise à jour des libellés
@@ -499,7 +502,7 @@ function AdaptationSource() {
     GH('label_enphase_shelly', lab_enphaseShelly);
 
     // Visibilité de la ligne d'IP externe/Référence
-    const isExternalSource = ['Ext', 'Enphase', 'SmartG', 'HomeW', 'ShellyEm', 'ShellyPro'].includes(F.Source);
+    const isExternalSource = ['Ext', 'Enphase', 'SmartG', 'HomeW', 'ShellyEm', 'ShellyPro', 'Zendure'].includes(F.Source);
     GID('ligneExt').style.display = isExternalSource ? "table-row" : "none";
     GID('ligneExtIPauto').style.display = F.Source === 'Enphase' ? "table-row" : "none";
 

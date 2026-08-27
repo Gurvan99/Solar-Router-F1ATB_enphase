@@ -356,6 +356,7 @@ const char *ParaHtml = R"====(
             <option value="HomeW">HomeWizard</option>
             <option value="ShellyEm">Shelly Em</option>
             <option value="ShellyPro">Shelly Pro Em</option>
+            <option value="Zendure">Zendure 3CT</option>
             <option value="Ext">ESP Externe</option>
             <option value="Pmqtt">MQTT</option>
           </select>

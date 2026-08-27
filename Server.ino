@@ -319,6 +319,9 @@ void handleAjaxRMS() {  // Envoi des dernières données  brutes reçues du RMS
     if (Source_data == "ShellyEm" || Source_data == "ShellyPro") {
       S += GS + ShEm_dataBrute;
     }
+    if (Source_data == "Zendure") {
+      S += GS + Zendure_dataBrute;
+    }
     if (Source_data == "UxIx3") {
       S += GS + MK333_dataBrute;
     }

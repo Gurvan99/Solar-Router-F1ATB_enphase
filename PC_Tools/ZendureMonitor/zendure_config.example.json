@@ -1,0 +1,5 @@
+{
+  "zendure_host": "REMPLACER_PAR_IP_DU_COMPTEUR",
+  "poll_interval_seconds": 5,
+  "web_port": 8081
+}

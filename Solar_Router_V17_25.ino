@@ -9,7 +9,7 @@
   
   RMS=Routeur Multi Sources
 
-  Choix de 10 sources différentes pour lire la consommation électrique en entrée de maison
+  Choix de 11 sources différentes pour lire la consommation électrique en entrée de maison
   - lecture de la tension avec un transformateur et du courant avec une sonde ampèremétrique (UxI)
   - lecture des données du Linky (Linky)
   - module (JSY-MK-194T) intégrant une mesure de tension secteur et 2 sondes ampèremétriques (UxIx2)
@@ -19,6 +19,7 @@
   - Lecture avec Shelly Pro Em
   - Lecture compteur SmartG 
   - Lecture compteur HomeWizard
+  - Lecture compteur Zendure 3CT
   - Lecture via MQTT
   - Lecture depuis un autre ESP depuis une des sources citées plus haut
   
@@ -324,6 +325,10 @@
     Support d'un nom d'hôte pour le serveur MQTT (en plus de l'IP), nécessaire pour se connecter à un broker MQTT cloud (ex. HiveMQ Cloud, EMQX Cloud) qui n'a pas d'IP fixe.
     Support de la connexion MQTT chiffrée TLS (port 8883), requis par la plupart des brokers cloud pour le pilotage à distance.
     Ajout d'un projet PlatformIO (platformio.ini) permettant de compiler ce sketch depuis VS Code, en alternative à l'Arduino IDE.
+  - Ajout d'une nouvelle source de mesure "Zendure 3CT" : compteur en HTTP simple, sans authentification ni TLS
+    (GET /properties/report), utilisant le champ IP externe déjà existant. Seule la phase A (a_aprt_power)
+    sert au routage ; l'énergie active est intégrée logiciellement (compteur cumulé Wh non fourni par cet appareil).
+    Cette source a été validée sur matériel réel.
 
  
 
@@ -718,6 +723,9 @@ String SG_dataBrute = "";
 
 //Paramètres for HomeWizard
 String HW_dataBrute = "";
+
+//Paramètres for Zendure 3CT
+String Zendure_dataBrute = "";
 
 //Paramètres for Shelly Em
 String ShEm_dataBrute = "";
@@ -1477,6 +1485,11 @@ void Task_LectureRMS(void *pvParameters) {
         LectureShellyProEm();
         LastRMS_Millis = millis();
         PeriodeProgMillis = 300 + ralenti;  //On adapte  la vitesse pour ne pas surchargé Wifi
+      }
+      if (Source == "Zendure") {
+        LectureZendure3CT();
+        LastRMS_Millis = millis();
+        PeriodeProgMillis = 300 + ralenti;  //On adapte la vitesse pour ne pas surchargé Wifi
       }
 
       if (Source == "Ext") {
