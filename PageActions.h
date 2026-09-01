@@ -270,6 +270,19 @@ const char *ActionsHtml = R"====(
                     </div>
                 </div>
             </div>
+
+            <div id="PuissanceMaxSoutirage_div">
+                <div>
+                    Puissance max de soutirage (W)
+                    <span class="fsize10">
+                        Sécurité globale : jamais dépassée par une action, même forcée manuellement
+                        (protection abonnement/disjoncteur). 0 = désactivé.
+                    </span>
+                </div>
+                <div class="form2">
+                    <input type="number" min="0" step="100" name="PuissanceMaxSoutirage" id="PuissanceMaxSoutirage" value="0"> W
+                </div>
+            </div>
         </div>
 
         <div id="BoutonsBas">

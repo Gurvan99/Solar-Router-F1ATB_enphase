@@ -329,6 +329,10 @@
     (GET /properties/report), utilisant le champ IP externe déjà existant. Seule la phase A (a_aprt_power)
     sert au routage ; l'énergie active est intégrée logiciellement (compteur cumulé Wh non fourni par cet appareil).
     Cette source a été validée sur matériel réel.
+  - Ajout d'un paramètre commun "Puissance max de soutirage" (page Actions), sécurité globale (0 = désactivé) :
+    même quand une action est forcée manuellement (ou par une période, ou par la sécurité anti-gel), son
+    ouverture est automatiquement réduite si besoin pour ne jamais dépasser cette puissance de soutirage
+    (protection contre un dépassement d'abonnement/disjoncteur).
 
  
 
@@ -755,6 +759,7 @@ Action LesActions[LES_ACTIONS_LENGTH];  //Liste des actions
 volatile int NbActions = 0;
 byte ReacCACSI = 1;
 unsigned int Fpwm = 500;  // Frequence signaux PWM en Hz
+float PuissanceMaxSoutirage = 0;  //Puissance max (W) de soutirage à ne jamais dépasser, même si une action est forcée manuellement (ou par une période/sécurité anti-gel). 0 = désactivé
 
 
 
@@ -793,6 +798,7 @@ float LastErrorPw[LES_ACTIONS_LENGTH];    //Floating value of previous Pw error
 float IntegrErrorPw[LES_ACTIONS_LENGTH];  //Integral de l'erreur
 float Propor[LES_ACTIONS_LENGTH];         // correction proportionnelle
 float DeriveF[LES_ACTIONS_LENGTH];        // Derive erreur filtrée
+float IntegrErrorPwSecu[LES_ACTIONS_LENGTH];  //Integral de la sécurité PuissanceMaxSoutirage (uniquement actions forcées On, 0=pas de restriction)
 
 //Variables in RAM for interruptions
 volatile unsigned long lastIT = 0;
@@ -1079,6 +1085,7 @@ void setup() {
     RetardF[i] = 100.0;
     LastErrorPw[i] = 0;
     IntegrErrorPw[i] = 100.0;
+    IntegrErrorPwSecu[i] = 0;
     Propor[i] = 0;
     DeriveF[i] = 0;
     OutOn[i] = 1;
@@ -1774,6 +1781,7 @@ void GestionOverproduction() {  // chaque 200ms (adaptation 5 fois par seconde)
   float MaxTriacPw;
   float Kp, Ki, Kd;
   float GainCACSI = float(ReacCACSI);
+  const float KiSecu = 0.004;  //Réactivité (volontairement plus rapide que la régulation normale) de la sécurité PuissanceMaxSoutirage
   int LeCanalTemp;
   bool forceOff;
   bool lissage = false;
@@ -1806,9 +1814,22 @@ void GestionOverproduction() {  // chaque 200ms (adaptation 5 fois par seconde)
     if (Actif[i] != MODE_INACTIF && P.Type > 1) {  // On ne traite plus le NO
       SeuilPw = float(P.Vmin);
       MaxTriacPw = float(P.Vmax);
-      if (P.Type == 2) {                  //ON
-        RetardF[i] = 100.0 - MaxTriacPw;  //On avec ouverture limitée en forcé prioritaire ou suivant la période
-      } else {                            // régulation 3 (PW) ou 4 (Triac)
+      if (P.Type == 2) {                          //ON
+        float RetardForce = 100.0 - MaxTriacPw;  //On avec ouverture limitée en forcé prioritaire ou suivant la période
+        if (PuissanceMaxSoutirage > 0) {
+          //Sécurité globale : même forcée, une action ne doit jamais faire dépasser la puissance
+          //max de soutirage configurée (protection abonnement/disjoncteur). On ferme davantage
+          //(retard croissant) tant que la puissance mesurée dépasse ce seuil, et on relâche
+          //progressivement dès qu'elle repasse en-dessous, sans jamais ouvrir plus que RetardForce.
+          IntegrErrorPwSecu[i] += (Puissance - PuissanceMaxSoutirage) * KiSecu;
+          IntegrErrorPwSecu[i] = constrain(IntegrErrorPwSecu[i], 0.0, MaxTriacPw);
+          RetardF[i] = RetardForce + IntegrErrorPwSecu[i];
+        } else {
+          IntegrErrorPwSecu[i] = 0;  //Sécurité désactivée : RAZ pour repartir propre si réactivée
+          RetardF[i] = RetardForce;
+        }
+      } else {  // régulation 3 (PW) ou 4 (Triac)
+        IntegrErrorPwSecu[i] = 0;  //Pas de forçage : RAZ de la sécurité dédiée au forçage manuel
 
         //Coef Integral ou réactivité
         Ki = float(LesActions[i].Ki) / 10000.0;
@@ -1846,6 +1867,7 @@ void GestionOverproduction() {  // chaque 200ms (adaptation 5 fois par seconde)
     } else {
       RetardF[i] = 100.0;
       IntegrErrorPw[i] = 100.0;
+      IntegrErrorPwSecu[i] = 0;
     }
     Retard[i] = round(RetardF[i]);         //Valeure entiere pour piloter le Triac et les relais
     if (RetardVx == i && Actif[i] != 0) {  //Affiche calcul retards port série ou Telnet

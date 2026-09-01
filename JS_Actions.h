@@ -1097,6 +1097,7 @@ function Send_Values(){
     // 3. Récupération des paramètres globaux
     F.Fpwm = document.querySelector('input[name="Fpwm"]:checked').value;
     F.ReacCACSI = document.querySelector('input[name="ReacCACSI"]:checked').value;
+    F.PuissanceMaxSoutirage = parseInt(GID("PuissanceMaxSoutirage").value, 10) || 0;
     F.NbActions=F.Actions.length;
     // 4. Envoi POST
     fetch("/ParaNew", {
@@ -1278,6 +1279,7 @@ function SetParaFixe(){
         GID("CACSI").style = "display:block;";
     }
     GID("Fpwm" + F.Fpwm).checked = true;
+    GID("PuissanceMaxSoutirage").value = F.PuissanceMaxSoutirage || 0;
 }
 
 

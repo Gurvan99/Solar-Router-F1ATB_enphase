@@ -358,6 +358,7 @@ void DeserializeConfiguration(String json) {
   // Zone des actions
   ReacCACSI = conf["ReacCACSI"];
   Fpwm = conf["Fpwm"];
+  PuissanceMaxSoutirage = conf["PuissanceMaxSoutirage"] | 0;  //Absent des anciens fichiers de config : 0 = désactivé
   NbActions = conf["NbActions"];
   int iAct = 0;
   JsonArray arr = conf["Actions"];
@@ -501,6 +502,9 @@ String SerializeConfiguration() {
     Fpwm = 500;
   conf["ReacCACSI"] = ReacCACSI;
   conf["Fpwm"] = Fpwm;
+  if (PuissanceMaxSoutirage < 0)
+    PuissanceMaxSoutirage = 0;
+  conf["PuissanceMaxSoutirage"] = PuissanceMaxSoutirage;
   conf["NbActions"] = NbActions;
   JsonArray arr = conf["Actions"].to<JsonArray>();
   for (int iAct = 0; iAct < NbActions; iAct++) {
