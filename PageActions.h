@@ -9,8 +9,8 @@ const char *ActionsHtml = R"====(
     <meta charset="UTF-8">
     <title>Actions</title>
 
-    <script src="/PinsActionsJS"></script>
-    <script src="/CommunCouleurJS"></script>
+    <script src="/PinsActionsJS" defer></script>
+    <script src="/CommunCouleurJS" defer></script>
     <link rel="stylesheet" href="/commun.css">
 
     <style>
@@ -296,11 +296,11 @@ const char *ActionsHtml = R"====(
     <div id="message"></div><br>
     <div id="pied"></div>
 
-    <script src="/ParaCommunJS"></script>
-    <script src="/ActionsJS1"></script>
-    <script src="/ActionsJS2"></script>
-    <script src="/ActionsJS3"></script>
-    <script src="/ActionsJS4"></script>
+    <script src="/ParaCommunJS" defer></script>
+    <script src="/ActionsJS1" defer></script>
+    <script src="/ActionsJS2" defer></script>
+    <script src="/ActionsJS3" defer></script>
+    <script src="/ActionsJS4" defer></script>
 </body>
 </html>
 

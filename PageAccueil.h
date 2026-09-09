@@ -311,11 +311,11 @@ const char *MainHtml = R"====(
   <div id="pied"></div>
 
   <!-- Scripts -->
-  <script src="/ParaCommunJS"></script>
-  <script src="MainJS1"></script>
-  <script src="MainJS2"></script>
-  <script src="MainJS3"></script>
-  <script src="/CommunCouleurJS"></script>
+  <script src="/ParaCommunJS" defer></script>
+  <script src="MainJS1" defer></script>
+  <script src="MainJS2" defer></script>
+  <script src="MainJS3" defer></script>
+  <script src="/CommunCouleurJS" defer></script>
 
   <br>
 

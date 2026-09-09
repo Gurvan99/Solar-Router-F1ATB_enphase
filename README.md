@@ -85,6 +85,23 @@ Routeur photovoltaïque basé sur **ESP32**, permettant d’optimiser l’autoco
 
 Le dépôt est un sketch Arduino classique (fichiers `.ino`/`.h`/`.cpp` à la racine). Deux méthodes de compilation sont possibles.
 
+### Assets web statiques (JS compressés en gzip)
+
+Les gros fichiers Javascript statiques (page Accueil, Actions, Paramètres, Données brutes,
+couleurs...) sont servis **pré-compressés en gzip** pour accélérer le premier chargement de la
+page web (moins de données à transférer sur le WiFi). Leur source lisible est dans `web_assets/*.js`
+(pas compilée directement), et un script Python génère à partir de là les en-têtes C réellement
+inclus dans le sketch (`web_assets/generated/*_gz.h`, tableaux d'octets `PROGMEM`).
+
+**Si vous modifiez un fichier sous `web_assets/*.js`**, il faut régénérer les en-têtes avant de
+compiler :
+```powershell
+python tools/build_gzip_assets.py
+```
+Ce script ne nécessite que la bibliothèque standard Python (pas de dépendance à installer). Les
+fichiers `web_assets/generated/*_gz.h` sont auto-générés (ne pas les éditer à la main) — pensez à
+les committer après régénération, ils sont compilés tels quels par PlatformIO/Arduino IDE.
+
 ### Option recommandée : PlatformIO (VS Code ou ligne de commande)
 
 Un projet PlatformIO (`platformio.ini`) est fourni à la racine du dépôt, il compile directement les fichiers existants sans rien déplacer.

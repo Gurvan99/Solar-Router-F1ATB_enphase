@@ -10,7 +10,7 @@ const char *PageBrute = R"====(
   <title>Data brute F1ATB</title>
 
   <link rel="stylesheet" href="/commun.css">
-  <script src="/CommunCouleurJS"></script>
+  <script src="/CommunCouleurJS" defer></script>
 
   <style>
     .ri { text-align: right; }
@@ -194,9 +194,9 @@ const char *PageBrute = R"====(
   <div id="pied"></div>
 
   <!-- Scripts -->
-  <script src="/ParaCommunJS"></script>
-  <script src="BruteJS1"></script>
-  <script src="BruteJS2"></script>
+  <script src="/ParaCommunJS" defer></script>
+  <script src="BruteJS1" defer></script>
+  <script src="BruteJS2" defer></script>
 
 </body>
 </html>

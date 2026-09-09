@@ -1,4 +1,4 @@
-#define Version "17.26"  //
+#define Version "17.27"  //
 #define HOSTNAME "RMS-ESP32-"
 
 
@@ -333,6 +333,16 @@
     même quand une action est forcée manuellement (ou par une période, ou par la sécurité anti-gel), son
     ouverture est automatiquement réduite si besoin pour ne jamais dépasser cette puissance de soutirage
     (protection contre un dépassement d'abonnement/disjoncteur).
+  - Version 17.27
+    Accélération du premier chargement de la page web (WiFi) :
+    - Mise en cache navigateur (Cache-Control) de favicon.ico/favicon192.ico/manifest.json (1 jour, ne changent
+      qu'au reflash).
+    - Ajout de l'attribut "defer" sur les balises <script> des pages Accueil/Actions/Para/Données brutes pour ne
+      plus bloquer l'affichage du HTML/CSS pendant le téléchargement des scripts.
+    - Compression gzip des gros fichiers Javascript statiques (MainJS2/3, ActionsJS1-4, ParaJS1/2, ParaCommunJS,
+      CommunCouleurJS, BruteJS1/2) : ~70-75% de volume transféré en moins sur le WiFi, et accessoirement moins de
+      flash utilisée (les sources JS lisibles sont maintenant dans web_assets/*.js, compilées en tableaux d'octets
+      gzip par tools/build_gzip_assets.py — voir section Compilation du README).
 
  
 

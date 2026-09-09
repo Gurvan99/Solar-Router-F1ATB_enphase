@@ -174,11 +174,11 @@ void handleMainJS1() {                  // Code Javascript
 }
 void handleMainJS2() {  // Code Javascript
   CacheEtClose(300);
-  server.send_P(200, "text/javascript", MainJS2);  // send_P : streame sans alloc heap
+  SendGzipJS(MainJS2_gz, MainJS2_gz_len);
 }
 void handleMainJS3() {  // Code Javascript
   CacheEtClose(300);
-  server.send_P(200, "text/javascript", MainJS3);  // send_P : streame sans alloc heap
+  SendGzipJS(MainJS3_gz, MainJS3_gz_len);
 }
 void handleBrute() {  // Page données brutes
   CacheEtClose(300);
@@ -186,11 +186,11 @@ void handleBrute() {  // Page données brutes
 }
 void handleBruteJS1() {  // Code Javascript
   CacheEtClose(300);
-  server.send_P(200, "text/javascript", PageBruteJS1); // send_P : streame sans alloc heap
+  SendGzipJS(PageBruteJS1_gz, PageBruteJS1_gz_len);
 }
 void handleBruteJS2() {  // Code Javascript
   CacheEtClose(300);
-  server.send_P(200, "text/javascript", PageBruteJS2); // send_P : streame sans alloc heap
+  SendGzipJS(PageBruteJS2_gz, PageBruteJS2_gz_len);
 }
 void handleAjaxRMS() {  // Envoi des dernières données  brutes reçues du RMS
   String S = "";
@@ -593,19 +593,19 @@ void handleActions() {
 }
 void handleActionsJS1() {
   CacheEtClose(300);
-  server.send_P(200, "text/javascript", ActionsJS1); // send_P : streame sans alloc heap
+  SendGzipJS(ActionsJS1_gz, ActionsJS1_gz_len);
 }
 void handleActionsJS2() {
   CacheEtClose(300);
-  server.send_P(200, "text/javascript", ActionsJS2); // send_P : streame sans alloc heap
+  SendGzipJS(ActionsJS2_gz, ActionsJS2_gz_len);
 }
 void handleActionsJS3() {
   CacheEtClose(300);
-  server.send_P(200, "text/javascript", ActionsJS3); // send_P : streame sans alloc heap
+  SendGzipJS(ActionsJS3_gz, ActionsJS3_gz_len);
 }
 void handleActionsJS4() {
   CacheEtClose(300);
-  server.send_P(200, "text/javascript", ActionsJS4); // send_P : streame sans alloc heap
+  SendGzipJS(ActionsJS4_gz, ActionsJS4_gz_len);
 }
 
 
@@ -682,15 +682,15 @@ void handleCleUpdate() {
 }
 void handleParaJS1() {
   CacheEtClose(300);
-  server.send_P(200, "text/javascript", ParaJS1); // send_P : streame sans alloc heap
+  SendGzipJS(ParaJS1_gz, ParaJS1_gz_len);
 }
 void handleParaJS2() {
   CacheEtClose(300);
-  server.send_P(200, "text/javascript", ParaJS2); // send_P : streame sans alloc heap
+  SendGzipJS(ParaJS2_gz, ParaJS2_gz_len);
 }
 void handleParaCommunJS() {
   CacheEtClose(300);
-  server.send_P(200, "text/javascript", ParaCommunJS); // send_P : streame sans alloc heap
+  SendGzipJS(ParaCommunJS_gz, ParaCommunJS_gz_len);
 }
 void handleParaFixe() {  //Paramètres stockés en fichier
   File file = LittleFS.open("/parametres.json", "r");
@@ -908,7 +908,7 @@ void handleCouleurs() {
 }
 void handleCommunCouleurJS() {  // Code Javascript
   CacheEtClose(300);
-  server.send_P(200, "text/javascript", CommunCouleurJS); // send_P pour envoyer depuis la mémoire flash
+  SendGzipJS(CommunCouleurJS_gz, CommunCouleurJS_gz_len);
 }
 void handleCouleursAjax() {
 
@@ -942,12 +942,15 @@ void handleCommunCSS() {
 }
 
 void handleFavicon() {
+  CacheEtClose(86400);  // Icone fixe (change seulement au reflash) : mise en cache 1 jour
   server.send(200, "image/svg+xml", Favicon);
 }
 void handleFavicon192() {
+  CacheEtClose(86400);  // Icone fixe (change seulement au reflash) : mise en cache 1 jour
   server.send(200, "image/svg+xml", Favicon192);
 }
 void handleManifest() {
+  CacheEtClose(86400);  // Manifest fixe (change seulement au reflash) : mise en cache 1 jour
   server.send(200, "application/json", Manifest);
 }
 void handleNotFound() {  // Page Web pas trouvé
@@ -966,8 +969,15 @@ void handleNotFound() {  // Page Web pas trouvé
   server.send(404, "text/plain", message);
 }
 
-void CacheEtClose(int16_t seconde) {
+void CacheEtClose(int32_t seconde) {
   server.sendHeader("Cache-Control", "max-age=" + String(seconde));
+}
+// Envoie un asset JS pré-compressé en gzip (généré par tools/build_gzip_assets.py
+// à partir de web_assets/*.js) : réduit fortement le volume transféré sur le WiFi,
+// le navigateur décompresse lui-même grâce à l'en-tête Content-Encoding.
+void SendGzipJS(const uint8_t* data, size_t len) {
+  server.sendHeader("Content-Encoding", "gzip");
+  server.send_P(200, "text/javascript", (PGM_P)data, len);
 }
 void lectureCookie(const char* S) {
   ExtraitCookie();

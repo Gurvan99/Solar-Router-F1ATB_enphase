@@ -7,7 +7,7 @@ const char *ParaHtml = R"====(
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="commun.css">
-  <script src="/CommunCouleurJS"></script>
+  <script src="/CommunCouleurJS" defer></script>
 
   <style>
     .form { margin: auto; padding: 5px; display: table; text-align: left; width: 100%; }
@@ -540,9 +540,9 @@ const char *ParaHtml = R"====(
     </form>
   </div>
 
-  <script src="/ParaCommunJS"></script>
-  <script src="/ParaJS1"></script>
-  <script src="/ParaJS2"></script>
+  <script src="/ParaCommunJS" defer></script>
+  <script src="/ParaJS1" defer></script>
+  <script src="/ParaJS2" defer></script>
 
 </body>
 </html>
