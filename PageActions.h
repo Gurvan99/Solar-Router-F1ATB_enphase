@@ -283,6 +283,31 @@ const char *ActionsHtml = R"====(
                     <input type="number" min="0" step="100" name="PuissanceMaxSoutirage" id="PuissanceMaxSoutirage" value="0"> W
                 </div>
             </div>
+
+            <div id="ModeVacances_div">
+                <div>
+                    Mode Vacances
+                    <span class="fsize10">
+                        Désactive les plages de forçage ON (chauffe réseau nocturne) et la surchauffe température.
+                        Le routage du surplus solaire reste 100% actif.
+                    </span>
+                </div>
+                <div class="form2">
+                    <div style="margin:4px 0;">
+                        <input type="checkbox" name="ModeVacances" id="ModeVacances" onchange="toggleVacances();" style="vertical-align:middle; cursor:pointer;">
+                        <label for="ModeVacances" style="cursor:pointer; font-weight:bold;">Activer le mode vacances</label>
+                    </div>
+                    <div id="VacancesOptions" style="display:none; margin-top:5px; padding:6px; background-color:rgba(0,0,0,0.05); border-radius:5px;">
+                        <div style="margin:4px 0;">
+                            Date de fin : <input type="date" name="DateFinVacances" id="DateFinVacances" onchange="changeDateFin();">
+                        </div>
+                        <div style="margin:4px 0;">
+                            ou Nb de jours : <input type="number" min="0" max="365" name="NbJoursVacances" id="NbJoursVacances" style="width:70px;" oninput="changeNbJours();"> jour(s)
+                            <span class="fsize10">(0 ou vide = pas d'expiration auto)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="BoutonsBas">

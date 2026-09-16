@@ -78,3 +78,5 @@ public:
 
 
 extern void StockMessage(String m);
+extern bool ModeVacances;
+

@@ -359,6 +359,9 @@ void DeserializeConfiguration(String json) {
   ReacCACSI = conf["ReacCACSI"];
   Fpwm = conf["Fpwm"];
   PuissanceMaxSoutirage = conf["PuissanceMaxSoutirage"] | 0;  //Absent des anciens fichiers de config : 0 = désactivé
+  ModeVacances = conf["ModeVacances"] | false;
+  DateFinVacances = conf["DateFinVacances"].as<String>();
+  if (DateFinVacances == "null") DateFinVacances = "";
   NbActions = conf["NbActions"];
   int iAct = 0;
   JsonArray arr = conf["Actions"];
@@ -505,6 +508,8 @@ String SerializeConfiguration() {
   if (PuissanceMaxSoutirage < 0)
     PuissanceMaxSoutirage = 0;
   conf["PuissanceMaxSoutirage"] = PuissanceMaxSoutirage;
+  conf["ModeVacances"] = ModeVacances;
+  conf["DateFinVacances"] = DateFinVacances;
   conf["NbActions"] = NbActions;
   JsonArray arr = conf["Actions"].to<JsonArray>();
   for (int iAct = 0; iAct < NbActions; iAct++) {

@@ -161,6 +161,21 @@ Cette sécurité ne concerne que les actions forcées "On" : les actions en rég
 puissance (`Vmin`/`Vmax`) propre à leur période et ne peuvent pas, par construction, pousser la
 puissance de soutirage globale au-delà de ce qu'impose la régulation en cours.
 
+### 2.6 Mode Vacances (`ModeVacances` / `DateFinVacances`)
+
+Le **Mode Vacances** est un commutateur global temporisé (page **Actions**, section *Paramètres
+communs aux Actions*, et pilotable par MQTT sur `[DeviceName]/Vacances`) destiné aux périodes
+d'absence :
+- Toutes les tranches horaires programmées en mode **ON forcé** (`Type == 2`, ex. chauffe
+  nocturne sur le réseau) sont automatiquement converties en **OFF** (`Type = 1`).
+- La surchauffe / sécurité température forcée (`TinfForce`/`TsupForce`, §2.3) est désactivée.
+- **Le mode Routage du surplus solaire (`Type == 3`) reste 100% actif** : s'il y a de la
+  production photovoltaïque excédentaire en journée, elle continue d'être déroutée normalement
+  vers les charges sans soutirage réseau.
+- Une **Date de fin** ou un **Nombre de jours** peut être configuré depuis l'interface : une fois
+  la date de fin dépassée (`DateAMJ > DateFinVacances`), le mode vacances est automatiquement
+  désactivé et le fonctionnement normal reprend.
+
 ## 3. Pilotage de la sortie physique
 
 - `RelaisOn()` : passe la sortie à l'état "on".

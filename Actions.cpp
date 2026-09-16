@@ -150,9 +150,14 @@ Action::ParaPeriode Action::ParaEnCours(int Heure, float Temperature, int Ltarfb
       P.Vmax = Vmax[i];
       if (P.Type==2) P.Vmax=ONouvre[i] ;
 
+      // En mode vacances, les plages "ON" (Type 2) sont désactivées (passent en OFF / Type 1)
+      if (ModeVacances && P.Type == 2) {
+        P.Type = 1;
+      }
+
       //Sécurité température en mode Routage relais (Type PW) : force l'ouverture à 100% si T <= TinfForce,
-      //reste forcé (hystérésis) tant que T n'est pas remontée à TsupForce
-      if (Type[i] == 3 && Temperature > -100.0 && TinfForce[i] > -1500 && TsupForce[i] > -1500 && TinfForce[i] < TsupForce[i]) {
+      //reste forcé (hystérésis) tant que T n'est pas remontée à TsupForce (désactivée en mode vacances)
+      if (!ModeVacances && Type[i] == 3 && Temperature > -100.0 && TinfForce[i] > -1500 && TsupForce[i] > -1500 && TinfForce[i] < TsupForce[i]) {
         if (Tempx10 <= TinfForce[i]) TseuilForce = TsupForce[i];  //Arme le forçage, seuil de sortie = TsupForce
         if (Tempx10 >= TsupForce[i]) TseuilForce = -2000;         //Désarme le forçage
         if (TseuilForce > -2000 && Tempx10 < TseuilForce) {
@@ -197,9 +202,14 @@ byte Action::TypeEnCours(int Heure, float Temperature, int Ltarfbin, int Retard)
       }
       if (ConditionsOk) S = Type[i];
 
+      // En mode vacances, les plages "ON" (Type 2) sont désactivées (passent en OFF / Type 1)
+      if (ModeVacances && S == 2) {
+        S = 1;
+      }
+
       //Sécurité température en mode Routage relais (Type PW) : force l'ouverture à 100% si T <= TinfForce,
-      //reste forcé (hystérésis) tant que T n'est pas remontée à TsupForce
-      if (Type[i] == 3 && Temperature > -100.0 && TinfForce[i] > -1500 && TsupForce[i] > -1500 && TinfForce[i] < TsupForce[i]) {
+      //reste forcé (hystérésis) tant que T n'est pas remontée à TsupForce (désactivée en mode vacances)
+      if (!ModeVacances && Type[i] == 3 && Temperature > -100.0 && TinfForce[i] > -1500 && TsupForce[i] > -1500 && TinfForce[i] < TsupForce[i]) {
         if (Tempx10 <= TinfForce[i]) TseuilForce = TsupForce[i];  //Arme le forçage, seuil de sortie = TsupForce
         if (Tempx10 >= TsupForce[i]) TseuilForce = -2000;         //Désarme le forçage
         if (TseuilForce > -2000 && Tempx10 < TseuilForce) {

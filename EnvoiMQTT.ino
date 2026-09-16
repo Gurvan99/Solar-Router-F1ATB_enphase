@@ -82,6 +82,9 @@ bool testMQTTconnected() {
             clientMQTT.subscribe(TopicAct);
           }
         }
+        char TopicVac[60];
+        snprintf(TopicVac, sizeof(TopicVac), "%s/Vacances", MQTTdeviceName.c_str());
+        clientMQTT.subscribe(TopicVac);
       }
       snprintf(StateTopic, sizeof(StateTopic), "%s%s_state", PrefixMQTTEtat, MQTTdeviceName.c_str());
       byte mac[6];  // the MAC address of your Wifi shield
@@ -189,6 +192,28 @@ void callback(char *topic, byte *payload, unsigned int length) {
         }
       }
     }
+    char TopicVac[60];
+    snprintf(TopicVac, sizeof(TopicVac), "%s/Vacances", MQTTdeviceName.c_str());
+    if (strcmp(TopicVac, topic) == 0) {
+      String msg = String(Message);
+      msg.trim();
+      if (msg == "1" || msg == "ON" || msg == "on" || msg == "true" || msg == "True") {
+        ModeVacances = true;
+        recordDemande = true;
+      } else if (msg == "0" || msg == "OFF" || msg == "off" || msg == "false" || msg == "False") {
+        ModeVacances = false;
+        DateFinVacances = "";
+        recordDemande = true;
+      } else if (message.indexOf("ModeVacances\":") > 0) {
+        ModeVacances = (int(ValJson("ModeVacances", message)) == 1);
+        if (message.indexOf("DateFin\":") > 0) {
+          DateFinVacances = StringJson("DateFin", message);
+          DateFinVacances.replace("-", "");
+        }
+        recordDemande = true;
+      }
+      StockMessage("MQTT Vacances : " + String(ModeVacances ? "ON" : "OFF"));
+    }
     if (recordDemande) RecordFichierParametres();
   }
 }
@@ -273,6 +298,8 @@ void sendMQTTDiscoveryMsg_global() {
   DeviceToDiscover("EnergieJour_M_Injectee", "Energie Jour M Injectée", "Wh", "energy", "0");
 
   DeviceToDiscover("ESP32_On", "ESP32 On", "h", "duration", "2");
+  DeviceBin2Discover("ModeVacances", "Mode Vacances");
+  DeviceTextToDiscover("DateFinVacances", "Date Fin Vacances");
 
   for (int i = 0; i < NbActions; i++) {
     ActType = "Ouverture_Relais_" + String(i);
@@ -458,6 +485,7 @@ void SendDataToHomeAssistant() {
   //Info ESP32
   float H = float(T_On_seconde) / 3600.0;
   len += snprintf(value + len, sizeof(value) - len, ",\"ESP32_On\":%f", H);
+  len += snprintf(value + len, sizeof(value) - len, ",\"ModeVacances\":%d,\"DateFinVacances\":\"%s\"", ModeVacances ? 1 : 0, DateFinVacances.c_str());
 
   len += snprintf(value + len, sizeof(value) - len, "}");
   clientMQTT.publish(StateTopic, value);

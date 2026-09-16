@@ -343,6 +343,10 @@
       CommunCouleurJS, BruteJS1/2) : ~70-75% de volume transféré en moins sur le WiFi, et accessoirement moins de
       flash utilisée (les sources JS lisibles sont maintenant dans web_assets/*.js, compilées en tableaux d'octets
       gzip par tools/build_gzip_assets.py — voir section Compilation du README).
+    Ajout du Mode Vacances (paramètres communs aux Actions et topic MQTT DeviceName/Vacances) :
+    Désactive automatiquement les plages horaires ON forcé (chauffe réseau) et les forçages de surchauffe
+    température, tout en maintenant 100% actif le routage du surplus solaire.
+    Prise en charge d'une date de fin ou d'un nombre de jours d'absence avec désactivation automatique à expiration.
 
  
 
@@ -770,6 +774,8 @@ volatile int NbActions = 0;
 byte ReacCACSI = 1;
 unsigned int Fpwm = 500;  // Frequence signaux PWM en Hz
 float PuissanceMaxSoutirage = 0;  //Puissance max (W) de soutirage à ne jamais dépasser, même si une action est forcée manuellement (ou par une période/sécurité anti-gel). 0 = désactivé
+bool ModeVacances = false;         //Mode Vacances : désactive les périodes ON et les forçages température, conserve le routage solaire
+String DateFinVacances = "";       //Date de fin du mode vacances ("YYYYMMDD"), vide si permanent tant que non désactivé
 
 
 

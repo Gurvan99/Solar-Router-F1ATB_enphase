@@ -75,6 +75,13 @@ function Send_Values(){
     F.Fpwm = document.querySelector('input[name="Fpwm"]:checked').value;
     F.ReacCACSI = document.querySelector('input[name="ReacCACSI"]:checked').value;
     F.PuissanceMaxSoutirage = parseInt(GID("PuissanceMaxSoutirage").value, 10) || 0;
+    F.ModeVacances = GID("ModeVacances").checked;
+    let dVal = GID("DateFinVacances").value;
+    if (dVal && dVal.length === 10) {
+        F.DateFinVacances = dVal.replace(/-/g, "");
+    } else {
+        F.DateFinVacances = "";
+    }
     F.NbActions=F.Actions.length;
     // 4. Envoi POST
     fetch("/ParaNew", {
@@ -245,6 +252,40 @@ function ShowAction() {
     }, Dt);
 }
 
+function toggleVacances() {
+    let on = GID("ModeVacances").checked;
+    GID("VacancesOptions").style.display = on ? "block" : "none";
+}
+
+function changeDateFin() {
+    let dVal = GID("DateFinVacances").value;
+    if (dVal) {
+        let parts = dVal.split("-");
+        let target = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        let today = new Date();
+        today.setHours(0, 0, 0, 0);
+        let diffMs = target.getTime() - today.getTime();
+        let diffJours = Math.round(diffMs / (1000 * 60 * 60 * 24));
+        GID("NbJoursVacances").value = (diffJours >= 0) ? diffJours : 0;
+    } else {
+        GID("NbJoursVacances").value = "";
+    }
+}
+
+function changeNbJours() {
+    let nb = parseInt(GID("NbJoursVacances").value, 10);
+    if (!isNaN(nb) && nb > 0) {
+        let d = new Date();
+        d.setDate(d.getDate() + nb);
+        let y = d.getFullYear();
+        let m = String(d.getMonth() + 1).padStart(2, '0');
+        let day = String(d.getDate()).padStart(2, '0');
+        GID("DateFinVacances").value = y + "-" + m + "-" + day;
+    } else {
+        GID("DateFinVacances").value = "";
+    }
+}
+
 //=============Fin Initialisation  ===============
 function SetParaFixe(){
     LoadParaVar();
@@ -257,6 +298,19 @@ function SetParaFixe(){
     }
     GID("Fpwm" + F.Fpwm).checked = true;
     GID("PuissanceMaxSoutirage").value = F.PuissanceMaxSoutirage || 0;
+
+    GID("ModeVacances").checked = (F.ModeVacances === true || F.ModeVacances === 1 || F.ModeVacances === "1");
+    if (F.DateFinVacances && F.DateFinVacances.length === 8) {
+        let a = F.DateFinVacances.substring(0, 4);
+        let m = F.DateFinVacances.substring(4, 6);
+        let j = F.DateFinVacances.substring(6, 8);
+        GID("DateFinVacances").value = a + "-" + m + "-" + j;
+        changeDateFin();
+    } else {
+        GID("DateFinVacances").value = "";
+        GID("NbJoursVacances").value = "";
+    }
+    toggleVacances();
 }
 
 

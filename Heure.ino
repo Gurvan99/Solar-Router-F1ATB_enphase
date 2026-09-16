@@ -69,6 +69,15 @@ void JourHeureChange() {
       PuisMaxI_T = 0;
       PuisMaxI_M = 0;
     }
+    // Vérification de la fin du mode vacances si une date de fin a été définie
+    if (ModeVacances && DateFinVacances.length() == 8) {
+      if (DateAMJ > DateFinVacances) {
+        ModeVacances = false;
+        DateFinVacances = "";
+        RecordFichierParametres();
+        StockMessage("Fin du Mode Vacances");
+      }
+    }
     old_Heure = Int_Heure;
     old_Minute = Int_Minute;
     oldDateAMJ = DateAMJ;
