@@ -233,7 +233,10 @@ function AdaptationSource() {
     GID('ligneEnphaseUser').style.display = (F.Source === 'Enphase') ? "table-row" : "none";
     GID('ligneEnphasePwd').style.display = (F.Source === 'Enphase') ? "table-row" : "none";
     GID('ligneEnphaseSerial').style.display = (F.Source === 'Enphase' || F.Source === 'ShellyEm' || F.Source === 'ShellyPro') ? "table-row" : "none";
+    // Visibilité de l'IP de la batterie Zendure
     GID('ligneZendureBatteryIP').style.display = (F.Source === 'Zendure') ? "table-row" : "none";
+    GID('ligneZendureReserve').style.display = (F.Source === 'Zendure') ? "table-row" : "none";
+    GID('ligneZendureAmorce').style.display = (F.Source === 'Zendure') ? "table-row" : "none";
 }
 
 /**

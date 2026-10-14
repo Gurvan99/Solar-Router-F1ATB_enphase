@@ -26,6 +26,11 @@ function Send_Values(){
         action.Repet = parseInt(GID("repet" + iAct).value, 10) || 0;
         action.Tempo = parseInt(GID("tempo" + iAct).value, 10) || 0;
         action.ForceOuvre = parseInt(GID("ForceOuvre" + iAct).value, 10) || 100;
+        const champTR = GID("TreserveBatt" + iAct);
+        if (champTR) {
+            const vTR = parseFloat(champTR.value);
+            action.TreserveBatt = (isNaN(vTR) || vTR < -50 || vTR > 150) ? -1600 : Math.round(vTR * 10);
+        }
         
         // Coefficients PID
         action.Kp = parseInt(GID("sliderKp" + iAct).value, 10) || 0;

@@ -111,6 +111,8 @@ function SetParaFixe() {
     GID("EnphasePwd").value = F.EnphasePwd;
     GID("EnphaseSerial").value = F.EnphaseSerial;
     GID("ZendureBatteryIP").value = int2ip(F.ZendureBatteryIP);
+    GID("ReserveBatterieZendure").value = F.ReserveBatterieZendure || 0;
+    GID("AmorceBatterieZendure").value = F.AmorceBatterieZendure === undefined ? 10 : F.AmorceBatterieZendure;
     GID("TopicP").value = F.TopicP;
     GID("MQTTRepet").value = F.MQTTRepet;
     GID("MQTTIP").value = int2ip(F.MQTTIP);
@@ -197,6 +199,8 @@ function SendValues() {
   F.RMSextIP = ip2int(GID("RMSextIP").value);
   F.RMSextIPauto = GID("RMSextIPauto").checked ? 1 : 0;
   F.ZendureBatteryIP = ip2int(GID("ZendureBatteryIP").value);
+  F.ReserveBatterieZendure = parseInt(GID("ReserveBatterieZendure").value, 10) || 0;
+  F.AmorceBatterieZendure = parseInt(GID("AmorceBatterieZendure").value, 10) || 0;
   F.Gateway = ip2int(GID("gateway").value);
   F.masque = ip2int(GID("masque").value);
   F.dns = ip2int(GID("dns").value);

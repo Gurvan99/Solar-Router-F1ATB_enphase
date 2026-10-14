@@ -50,6 +50,7 @@ public:
   byte Kp, Ki, Kd;
   byte NbPeriode;
   byte ForceOuvre;
+  int16_t TreserveBatt;  //Réserve batterie Zendure si T >= ce seuil (Temperature * 10, -1600 = non utilisé)
   byte ExtSelAct;     //Selection Action en cours
   int8_t ExtValide;   //Condition Action externe
   int16_t ExtHequiv;  //Duree heure *100 action externe

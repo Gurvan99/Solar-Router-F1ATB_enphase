@@ -316,6 +316,8 @@ void DeserializeConfiguration(String json) {
   RMSextIP = conf["RMSextIP"];
   RMSextIPauto = conf["RMSextIPauto"].isNull() ? RMSextIPauto : conf["RMSextIPauto"];
   ZendureBatteryIP = conf["ZendureBatteryIP"];
+  ReserveBatterieZendure = conf["ReserveBatterieZendure"] | 0;
+  AmorceBatterieZendure = conf["AmorceBatterieZendure"] | 10;
   EnphaseUser = conf["EnphaseUser"].as<String>();
   EnphasePwd = conf["EnphasePwd"].as<String>();
   EnphaseSerial = conf["EnphaseSerial"].as<String>();
@@ -386,6 +388,7 @@ void DeserializeConfiguration(String json) {
       LesActions[iAct].PID = obj["PID"];
     }
     LesActions[iAct].ForceOuvre = !obj["ForceOuvre"].isNull() ? obj["ForceOuvre"] : 100;
+    LesActions[iAct].TreserveBatt = !obj["TreserveBatt"].isNull() ? obj["TreserveBatt"] : -1600;
     LesActions[iAct].NbPeriode = obj["NbPeriode"];
 
     Hdeb = 0;
@@ -456,6 +459,8 @@ String SerializeConfiguration() {
   conf["RMSextIP"] = RMSextIP;
   conf["RMSextIPauto"] = RMSextIPauto;
   conf["ZendureBatteryIP"] = ZendureBatteryIP;
+  conf["ReserveBatterieZendure"] = ReserveBatterieZendure;
+  conf["AmorceBatterieZendure"] = AmorceBatterieZendure;
   conf["EnphaseUser"] = EnphaseUser;
   conf["EnphasePwd"] = EnphasePwd;
   conf["EnphaseSerial"] = EnphaseSerial;
@@ -525,6 +530,7 @@ String SerializeConfiguration() {
     obj["OrdreOn"] = LesActions[iAct].OrdreOn;
     obj["OrdreOff"] = LesActions[iAct].OrdreOff;
     obj["ForceOuvre"] = LesActions[iAct].ForceOuvre;
+    obj["TreserveBatt"] = LesActions[iAct].TreserveBatt;
     obj["Repet"] = LesActions[iAct].Repet;
     obj["Tempo"] = LesActions[iAct].Tempo;
     obj["Kp"] = LesActions[iAct].Kp;

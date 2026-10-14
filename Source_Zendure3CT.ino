@@ -9,9 +9,13 @@
 // * ne fournit pas de tension, fixée arbitrairement à     *
 // * 220V.                                                *
 // ******************************************************
+#include "ZendureReserve.h"
 
 void LectureZendure3CT() {
   static unsigned long LastZendureMillis = 0;  // pour l'intégration logicielle de l'énergie
+  // Initialisation des mesures batterie comme invalides
+  PwBatteryCharge = -1;
+  BatteryStatus = -1;
 
   String Zendure_Data = "";
   WiFiClient clientESP_RMS;
@@ -57,6 +61,7 @@ void LectureZendure3CT() {
   float Pw = PfloatMax(ValJson("a_aprt_power", Zendure_Data));
   float PwBattery = 0;
 
+  // Lecture de la batterie Zendure (SolarFlow) si son IP est définie
   if (ZendureBatteryIP > 0) {
     String Battery_Data = "";
     String batteryHost = IP2String(ZendureBatteryIP);
@@ -76,6 +81,8 @@ void LectureZendure3CT() {
       if (timeoutBatterie) {
         StockMessage("Timeout batterie Zendure : " + batteryHost);
       } else {
+        // Lecture jusqu'à la fermeture par la batterie (Connection: close) : le corps JSON
+        // peut arriver après les en-têtes HTTP, le tampon est alors momentanément vide.
         timeout = millis();
         while ((clientESP_RMS.connected() || clientESP_RMS.available()) && (millis() - timeout < 5000)) {
           if (clientESP_RMS.available()) {
@@ -91,16 +98,30 @@ void LectureZendure3CT() {
       if (!timeoutBatterie && p >= 0 && Battery_Data.indexOf("\"packInputPower\"") > 0) {
         String json = Battery_Data.substring(p);
         PwBattery = PfloatMax(ValJson("packInputPower", json));
+        PwBatteryCharge = PfloatMax(ValJson("outputPackPower", json));
+        // packInputPower est la puissance délivrée par la batterie ; outputPackPower est la puissance qui la charge.
+        int niveauBatterie;
+        if (ZendureReserve::LireElectricLevel(json.c_str(), niveauBatterie)) {
+          BatteryStatus = niveauBatterie;
+        } else {
+          StockMessage("electricLevel absent ou invalide (attendu 0-100) : " + batteryHost);
+        }
+        //Zendure_dataBrute += "<br><strong>Batterie Zendure</strong><br>" + json;
       } else if (!timeoutBatterie) {
         StockMessage("packInputPower non trouvé sur : " + batteryHost + " (" + String(Battery_Data.length()) + " octets reçus)");
       }
     }
   }
-
   float voltage = 220;
 
-  // La décharge de la batterie est comptée comme une consommation pour ne pas la détourner vers les actions.
+  // La décharge de la batterie (packInputPower) est comptée comme une consommation : le
+  // routeur ne détourne pas vers les actions l'énergie restituée par la batterie.
   float PwRoutage = Pw + PwBattery;
+  // static int cptTraceZendure = 0;  // trace de mise au point, limitée aux 100 premières lectures
+  // if (cptTraceZendure < 100) {
+  //   cptTraceZendure++;
+  //   TelnetPrintln("Zendure " + String(cptTraceZendure) + " : PwRoutage=" + String(PwRoutage) + " Pw=" + String(Pw) + " PwBattery=" + String(PwBattery));
+  // }
   if (PwRoutage >= 0) {
     PuissanceS_M_inst = PwRoutage;
     PuissanceI_M_inst = 0;

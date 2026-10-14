@@ -24,6 +24,7 @@ Action::Action(int aIdx) {
   OutOn = 1;
   OutOff = 0;
   ForceOuvre = 100;
+  TreserveBatt = -1600;  //Réserve batterie Zendure désactivée par défaut
   Tempo = 0;
   Repet = 0;
   tOnOff = 0;

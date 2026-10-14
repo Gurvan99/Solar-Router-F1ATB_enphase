@@ -2,3 +2,9 @@
 .pio/
 *.bak
 .vscode/
+.vs/
+Test/test_reserve_batterie
+Test/test_reserve_batterie.exe
+Test/test_reserve_batterie.obj
+Test/bin/
+Test/obj/

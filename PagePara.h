@@ -24,7 +24,7 @@ const char *ParaHtml = R"====(
     .Bgeneraux { border: inset 4px azure; }
     #BoutonsBas { text-align:center; display: flex;justify-content: space-around;}
     #ligneFixe, .ligneTemperature, #ligneExt,#ligneExtIPauto, #ligneEnphaseUser, #ligneEnphasePwd, #ligneEnphaseSerial,
-    #ligneZendureBatteryIP, #infoIP, #ligneTopicP, #ligneTopicT { display:none; }
+    #ligneZendureBatteryIP, #ligneZendureReserve, #ligneZendureAmorce, #infoIP, #ligneTopicP, #ligneTopicT { display:none; }
     .Zone, .generaux { width:100%; border:1px solid grey; border-radius:10px; margin-top:10px;
                        background-color:rgba(30,30,30,0.3); }
     #onglets2 { display:block; }
@@ -397,6 +397,18 @@ const char *ParaHtml = R"====(
         <div class="ligne" id="ligneZendureBatteryIP">
           <label for="ZendureBatteryIP">Adresse IP de la batterie Zendure :</label>
           <input type="text" id="ZendureBatteryIP" name="ZendureBatteryIP" autocomplete="on">
+        </div>
+
+        <div class="ligne" id="ligneZendureReserve">
+          <label for="ReserveBatterieZendure">Puissance réservée à la batterie Zendure (W) :</label>
+          <input type="number" id="ReserveBatterieZendure" name="ReserveBatterieZendure" min="0" max="5000" step="1"
+                 title="Surplus laissé à la batterie quand la température de l'action dépasse son seuil">
+        </div>
+
+        <div class="ligne" id="ligneZendureAmorce">
+          <label for="AmorceBatterieZendure">Puissance d'amorçage de la batterie Zendure (W) :</label>
+          <input type="number" id="AmorceBatterieZendure" name="AmorceBatterieZendure" min="0" max="5000" step="1"
+                 title="Puissance réservée pour amorcer la charge de la batterie (10 W par défaut)">
         </div>
 
         <div class="ligne" id="ligneTopicP">
