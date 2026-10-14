@@ -233,6 +233,7 @@ function AdaptationSource() {
     GID('ligneEnphaseUser').style.display = (F.Source === 'Enphase') ? "table-row" : "none";
     GID('ligneEnphasePwd').style.display = (F.Source === 'Enphase') ? "table-row" : "none";
     GID('ligneEnphaseSerial').style.display = (F.Source === 'Enphase' || F.Source === 'ShellyEm' || F.Source === 'ShellyPro') ? "table-row" : "none";
+    GID('ligneZendureBatteryIP').style.display = (F.Source === 'Zendure') ? "table-row" : "none";
 }
 
 /**

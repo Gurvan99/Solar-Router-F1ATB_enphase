@@ -689,6 +689,7 @@ String TokenEnphase = "";
 String EnphaseUser = "";
 String EnphasePwd = "";
 String EnphaseSerial = "0";  //Sert égalemnet au Shelly comme numéro de voie
+unsigned long ZendureBatteryIP = 0;  // Adresse IP de la batterie Zendure
 String EnvoySessionIdCookie = "";  // Cookie `sessionId` renvoyé par l'API Enphase Envoy pour les requêtes authentifiées, reutilisé pour accélerer les appels suivants (~25ms economisés par rapport a Bearer Token)
 unsigned long lastTokenUpdate = 0;  //interval de temps depuis dernier Token Enphase //SR19
 

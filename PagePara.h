@@ -24,7 +24,7 @@ const char *ParaHtml = R"====(
     .Bgeneraux { border: inset 4px azure; }
     #BoutonsBas { text-align:center; display: flex;justify-content: space-around;}
     #ligneFixe, .ligneTemperature, #ligneExt,#ligneExtIPauto, #ligneEnphaseUser, #ligneEnphasePwd, #ligneEnphaseSerial,
-    #infoIP, #ligneTopicP, #ligneTopicT { display:none; }
+    #ligneZendureBatteryIP, #infoIP, #ligneTopicP, #ligneTopicT { display:none; }
     .Zone, .generaux { width:100%; border:1px solid grey; border-radius:10px; margin-top:10px;
                        background-color:rgba(30,30,30,0.3); }
     #onglets2 { display:block; }
@@ -392,6 +392,11 @@ const char *ParaHtml = R"====(
           <label for="EnphaseSerial" id="label_enphase_shelly"></label>
           <input type="text" id="EnphaseSerial" name="EnphaseSerial"
                 onchange="checkDisabled();" autocomplete="on">
+        </div>
+
+        <div class="ligne" id="ligneZendureBatteryIP">
+          <label for="ZendureBatteryIP">Adresse IP de la batterie Zendure :</label>
+          <input type="text" id="ZendureBatteryIP" name="ZendureBatteryIP" autocomplete="on">
         </div>
 
         <div class="ligne" id="ligneTopicP">

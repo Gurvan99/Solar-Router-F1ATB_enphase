@@ -110,6 +110,7 @@ function SetParaFixe() {
     GID("EnphaseUser").value = F.EnphaseUser;
     GID("EnphasePwd").value = F.EnphasePwd;
     GID("EnphaseSerial").value = F.EnphaseSerial;
+    GID("ZendureBatteryIP").value = int2ip(F.ZendureBatteryIP);
     GID("TopicP").value = F.TopicP;
     GID("MQTTRepet").value = F.MQTTRepet;
     GID("MQTTIP").value = int2ip(F.MQTTIP);
@@ -195,6 +196,7 @@ function SendValues() {
   }
   F.RMSextIP = ip2int(GID("RMSextIP").value);
   F.RMSextIPauto = GID("RMSextIPauto").checked ? 1 : 0;
+  F.ZendureBatteryIP = ip2int(GID("ZendureBatteryIP").value);
   F.Gateway = ip2int(GID("gateway").value);
   F.masque = ip2int(GID("masque").value);
   F.dns = ip2int(GID("dns").value);
@@ -268,4 +270,3 @@ function SendValues() {
       });
   }
 }
-

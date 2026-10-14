@@ -315,6 +315,7 @@ void DeserializeConfiguration(String json) {
   Source = conf["Source"].as<String>();
   RMSextIP = conf["RMSextIP"];
   RMSextIPauto = conf["RMSextIPauto"].isNull() ? RMSextIPauto : conf["RMSextIPauto"];
+  ZendureBatteryIP = conf["ZendureBatteryIP"];
   EnphaseUser = conf["EnphaseUser"].as<String>();
   EnphasePwd = conf["EnphasePwd"].as<String>();
   EnphaseSerial = conf["EnphaseSerial"].as<String>();
@@ -454,6 +455,7 @@ String SerializeConfiguration() {
   conf["Source"] = Source;
   conf["RMSextIP"] = RMSextIP;
   conf["RMSextIPauto"] = RMSextIPauto;
+  conf["ZendureBatteryIP"] = ZendureBatteryIP;
   conf["EnphaseUser"] = EnphaseUser;
   conf["EnphasePwd"] = EnphasePwd;
   conf["EnphaseSerial"] = EnphaseSerial;

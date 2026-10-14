@@ -55,14 +55,58 @@ void LectureZendure3CT() {
   Zendure_dataBrute = "<strong>Zendure 3CT</strong><br>" + Zendure_Data;  // pour la page "Données brutes"
 
   float Pw = PfloatMax(ValJson("a_aprt_power", Zendure_Data));
+  float PwBattery = 0;
+
+  if (ZendureBatteryIP > 0) {
+    String Battery_Data = "";
+    String batteryHost = IP2String(ZendureBatteryIP);
+    if (!clientESP_RMS.connect(batteryHost.c_str(), 80, 3000)) {
+      StockMessage("connection to Zendure batterie failed : " + batteryHost);
+    } else {
+      clientESP_RMS.print(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + batteryHost + "\r\n" + "Connection: close\r\n\r\n");
+      timeout = millis();
+      bool timeoutBatterie = false;
+      while (clientESP_RMS.available() == 0) {
+        if (millis() - timeout > 5000) {
+          timeoutBatterie = true;
+          break;
+        }
+        delay(1);
+      }
+      if (timeoutBatterie) {
+        StockMessage("Timeout batterie Zendure : " + batteryHost);
+      } else {
+        timeout = millis();
+        while ((clientESP_RMS.connected() || clientESP_RMS.available()) && (millis() - timeout < 5000)) {
+          if (clientESP_RMS.available()) {
+            Battery_Data += clientESP_RMS.readStringUntil('\r');
+          } else {
+            delay(1);
+          }
+        }
+      }
+      clientESP_RMS.stop();
+
+      p = Battery_Data.indexOf("{");
+      if (!timeoutBatterie && p >= 0 && Battery_Data.indexOf("\"packInputPower\"") > 0) {
+        String json = Battery_Data.substring(p);
+        PwBattery = PfloatMax(ValJson("packInputPower", json));
+      } else if (!timeoutBatterie) {
+        StockMessage("packInputPower non trouvé sur : " + batteryHost + " (" + String(Battery_Data.length()) + " octets reçus)");
+      }
+    }
+  }
+
   float voltage = 220;
 
-  if (Pw >= 0) {
-    PuissanceS_M_inst = Pw;
+  // La décharge de la batterie est comptée comme une consommation pour ne pas la détourner vers les actions.
+  float PwRoutage = Pw + PwBattery;
+  if (PwRoutage >= 0) {
+    PuissanceS_M_inst = PwRoutage;
     PuissanceI_M_inst = 0;
   } else {
     PuissanceS_M_inst = 0;
-    PuissanceI_M_inst = -Pw;
+    PuissanceI_M_inst = -PwRoutage;
   }
   // Pas de facteur de puissance fourni par ce compteur : pas de puissance apparente calculable.
   PVAS_M_inst = 0;
