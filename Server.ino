@@ -497,7 +497,10 @@ void handleAjax_etatActions() {
         S += String(100 - Retard[i]) + RS;
       }
       S += String(LesActions[i].tOnOff) + RS;
-      S += String(int(LesActions[i].H_Ouvre * 100.0)) + RS;
+      S += String(int(LesActions[i].H_OuvreRoutage * 100.0)) + RS;
+      S += String(static_cast<unsigned long>(LesActions[i].PuissanceNominale * LesActions[i].H_OuvreRoutage + 0.5f)) + RS;
+      S += String(int(LesActions[i].H_OuvreForce * 100.0)) + RS;
+      S += String(static_cast<unsigned long>(LesActions[i].PuissanceNominale * LesActions[i].H_OuvreForce + 0.5f)) + RS;
       S += GS;
       NbActifs++;
     }
@@ -1086,4 +1089,3 @@ void envoyerHistoriqueEnergie(WebServer &serverRef) {
   //envoie le marqueur "0"
   writer.finalise();
 }
-

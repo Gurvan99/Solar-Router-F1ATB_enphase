@@ -55,9 +55,13 @@ public:
   int8_t ExtValide;   //Condition Action externe
   int16_t ExtHequiv;  //Duree heure *100 action externe
   int16_t ExtOuvert;  //Pourcent ouverture
+  int PuissanceNominale;  //Puissance nominale en W pour le calcul de l'énergie équivalente
+  float H_Ouvre;  //Cumul équivalent historique conservé pour MQTT et les actions distantes
+  float H_OuvreRoutage;
+  float H_OuvreForce;
+  bool EnRoutage;
 
   bool On, PID;
-  float H_Ouvre;
   byte Type[8];  //0=NO(pas utilisé),1=OFF,2=ON,3=PW,4=Triac
   int16_t Hdeb[8];
   int16_t Hfin[8];
@@ -80,4 +84,3 @@ public:
 
 extern void StockMessage(String m);
 extern bool ModeVacances;
-

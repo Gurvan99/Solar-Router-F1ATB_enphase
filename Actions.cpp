@@ -10,6 +10,11 @@
 //Class Action
 Action::Action() {
   Gpio = -1;
+  PuissanceNominale = 0;
+  H_Ouvre = 0;
+  H_OuvreRoutage = 0;
+  H_OuvreForce = 0;
+  EnRoutage = false;
 }
 Action::Action(int aIdx) {
   Gpio = -1;  // si le n° de pin n'est pas valid, on ne fait rien
@@ -28,7 +33,11 @@ Action::Action(int aIdx) {
   Tempo = 0;
   Repet = 0;
   tOnOff = 0;
+  PuissanceNominale = 0;
   H_Ouvre = 0;
+  H_OuvreRoutage = 0;
+  H_OuvreForce = 0;
+  EnRoutage = false;
   ExtSelAct = 255;
   ExtValide = 0;  //Condition Action externe
   ExtHequiv = 0;  //Duree heure *100 action externe

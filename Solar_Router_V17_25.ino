@@ -1904,11 +1904,18 @@ void H_Ouvre_Equivalent(unsigned long dt) {
   float Dheure = float(dt) / 3600000.0;
   for (int i = 0; i < NbActions; i++) {
     if (Actif[i] != MODE_INACTIF) {                           //valeur en RAM du Mode de regulation
+      float Houvre;
       if (i == 0 && Actif[i] == MODE_DECOUPE_ONOFF) {         //Decoupe pour Triac
         float teta = 6.28318 * (100.0 - RetardF[i]) / 100.0;  //2*PI integral sin²
-        LesActions[i].H_Ouvre += Dheure * (teta - sin(2.0 * teta) / 2.0) / 6.28318;
+        Houvre = Dheure * (teta - sin(2.0 * teta) / 2.0) / 6.28318;
       } else {
-        LesActions[i].H_Ouvre += Dheure * (100 - RetardF[i]) / 100.0;
+        Houvre = Dheure * (100 - RetardF[i]) / 100.0;
+      }
+      LesActions[i].H_Ouvre += Houvre;
+      if (LesActions[i].EnRoutage) {
+        LesActions[i].H_OuvreRoutage += Houvre;
+      } else {
+        LesActions[i].H_OuvreForce += Houvre;
       }
     }
   }

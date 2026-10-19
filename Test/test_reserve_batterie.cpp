@@ -78,6 +78,7 @@ class Action {
   byte Kd = 0;
   bool PID = false;
   int canalTemperature = -1;
+  bool EnRoutage = false;
   ParaPeriode parametres;
   int arrets = 0;
   int marches = 0;
@@ -298,6 +299,24 @@ void testerGestionOverproductionDeuxActions() {
            "GestionOverproduction laisse l'action non éligible fonctionner");
   verifier(LesActions[1].arrets == 1 && LesActions[2].marches == 1,
            "appelle Arreter/RelaisOn en cohérence avec chaque décision");
+  verifier(LesActions[1].EnRoutage && LesActions[2].EnRoutage,
+           "classe les périodes de régulation comme du routage");
+
+  reinitialiser();
+  NbActions = 1;
+  LesActions[0].Actif = MODE_DECOUPE_ONOFF;
+  LesActions[0].parametres = Action::ParaPeriode(4, 0, 100);
+  GestionOverproduction();
+  verifier(LesActions[0].EnRoutage,
+           "classe la découpe triac comme du routage");
+
+  reinitialiser();
+  NbActions = 2;
+  configurerActionRelais(1, 200);
+  LesActions[1].parametres = Action::ParaPeriode(2, 0, 100);
+  GestionOverproduction();
+  verifier(!LesActions[1].EnRoutage,
+           "classe une période ON forcée hors du routage");
 
   reinitialiser();
   NbActions = 3;

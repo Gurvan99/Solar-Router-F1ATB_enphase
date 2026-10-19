@@ -48,6 +48,7 @@ function CreerAction(NumAction, Titre) {
         Kd: 10,
         PID: 0,
         ForceOuvre:100,
+        PuissanceNominale:0,
         TreserveBatt: -1600,
         Periodes: [{
                     Hfin: 2400,
@@ -106,6 +107,7 @@ function TracePlanning(iAct) {
     S += "<div class='TitZone' title='Définir la broche (GPIO) ou commande'>Sortie</div>" + SelectPin + SelectOut;
     S += "<div><span id='Tempo" + iAct + "'>Temporisation(s) <input type='number' class='tm' id='tempo" + iAct + "' title='Temporisation entre chaque changement d&apos;état pour éviter des oscillations quand un appareil dans la maison consomme en dents de scie (Ex: un four).'></span></div>";
     S += "<div><span id='forceOuvre" + iAct + "'>Ouverture si forcée<input type='number' class='tm' id='ForceOuvre" + iAct + "' min='0' max='100' step='1' title='Ouverture prioritaire maximum en % si action forcée'>%</span> </div>";
+    S += "<div>Puissance nominale<input type='number' class='tm' id='PuissanceNominale" + iAct + "' min='0' max='2147483647' step='1' title='Puissance nominale de la charge pour le calcul de son énergie équivalente'> W</div>";
     if (F.Source === 'Zendure') {
         S += "<div><span id='reserveBatt" + iAct + "'>Réserve batterie si T &ge;<input type='number' class='tm' id='TreserveBatt" + iAct + "' step='0.1' title='Au-dessus de cette température (canal de la période en cours), l&apos;action laisse la puissance réservée (page Paramètres) à la batterie. Vide = désactivé.'>°</span></div>";
     }
@@ -168,6 +170,7 @@ function TracePlanning(iAct) {
         GV("repet" + iAct, action.Repet);
         GV("tempo" + iAct, action.Tempo);
         GV("ForceOuvre" + iAct, action.ForceOuvre);
+        GV("PuissanceNominale" + iAct, action.PuissanceNominale ?? 0);
         if (GID("TreserveBatt" + iAct)) {
             const TR = (action.TreserveBatt !== undefined) ? action.TreserveBatt : -1600;
             GV("TreserveBatt" + iAct, (TR >= -500 && TR <= 1500) ? TR / 10 : "");
@@ -323,4 +326,3 @@ function TracePeriodes(iAct) {
     // Combine les zones d'info cliquables (SinfoClick) et le contenu (Sinfo)
     GH("infoAction" + iAct, SinfoClick + Sinfo);
 }
-

@@ -38,6 +38,7 @@
     if (forceOff) {
       P.Type = 1;  //  on arrete
     }
+    LesActions[i].EnRoutage = (P.Type == 3 || P.Type == 4);
     if (Actif[i] != MODE_INACTIF && P.Type > 1) {  // On ne traite plus le NO
       SeuilPw = float(P.Vmin);
       MaxTriacPw = float(P.Vmax);

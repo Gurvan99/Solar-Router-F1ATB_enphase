@@ -56,7 +56,7 @@ async function EtatActions(Force, NumAction) {
                 // data est à partir de message[i + 4]
                 const data = message[i + 4].split(RS); 
                 
-                if (data.length < 5) continue; // Sauter les lignes mal formatées
+                if (data.length < 8) continue; // Sauter les lignes mal formatées
 
                 // Stockage du forçage actuel
                 ActionForce[i] = data[3];
@@ -84,7 +84,10 @@ async function EtatActions(Force, NumAction) {
                 
                 // Stockage de l'ouverture (LastActOuvre doit être un tableau global)
                 LastActOuvre[parseInt(data[0], 10)] = ouvre; 
-                S_html += `<div class='ce item_val'>${Hdeci2Hmn(data[4])}</div>`;
+                S_html += `<div class='ce item_val'>
+                    <div>Routage : ${Hdeci2Hmn(data[4])} · ${data[5]} Wh</div>
+                    <div>Forcé : ${Hdeci2Hmn(data[6])} · ${data[7]} Wh</div>
+                </div>`;
                
 
                 // Logique des boutons de Forçage
@@ -105,7 +108,7 @@ async function EtatActions(Force, NumAction) {
         S_html = S_html + T_html;
         
         if (S_html !== "") { 
-            const header = "<div class='item_Act ce'>Etat Action(s)</div><div class='item_H ce'>H<div class='fsize10'>ouverture équivalente</div></div><div class='item_Force ce'> Forçage</div>";
+            const header = "<div class='item_Act ce'>Etat Action(s)</div><div class='item_H ce'>Ouverture équivalente<div class='fsize10'>Temps · énergie</div></div><div class='item_Force ce'> Forçage</div>";
                 GH("etatActions", header + S_html);
                 setBoColorQuery("th", "#" + Koul[Coul_Tab][5]); 
                 setBoColorQuery("td", "#" + Koul[Coul_Tab][5]);

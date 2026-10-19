@@ -26,6 +26,7 @@ function Send_Values(){
         action.Repet = parseInt(GID("repet" + iAct).value, 10) || 0;
         action.Tempo = parseInt(GID("tempo" + iAct).value, 10) || 0;
         action.ForceOuvre = parseInt(GID("ForceOuvre" + iAct).value, 10) || 100;
+        action.PuissanceNominale = Math.max(0, parseInt(GID("PuissanceNominale" + iAct).value, 10) || 0);
         const champTR = GID("TreserveBatt" + iAct);
         if (champTR) {
             const vTR = parseFloat(champTR.value);

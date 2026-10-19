@@ -53,6 +53,8 @@ void JourHeureChange() {
     if (old_Heure == 5 && Int_Heure == 6) {
       for (int i = 0; i < LES_ACTIONS_LENGTH; i++) {
         LesActions[i].H_Ouvre = 0;  //RAZ temps equivalent ouverture à 6h du matin
+        LesActions[i].H_OuvreRoutage = 0;
+        LesActions[i].H_OuvreForce = 0;
       }
     }
     if (old_Heure == 23 && Int_Heure == 0) {

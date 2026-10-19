@@ -231,7 +231,9 @@ et interpréter (côté action "dépendante", via `SelAct[i]`) l'état partagé 
 | `NbPeriode` | Nombre de tranches horaires configurées (≤ 8). |
 | `ForceOuvre` | Ouverture (%) appliquée quand l'action est forcée "On" (manuel ou sécurité température). |
 | `ExtSelAct`, `ExtValide`, `ExtHequiv`, `ExtOuvert` | État de la dépendance à une autre action (locale/RMS) : action surveillée, validité (compteur décrémenté), durée équivalente et % d'ouverture reçus. |
-| `On`, `H_Ouvre` | État courant (relais fermé ?) et cumul de temps d'ouverture équivalent (heures), remis à zéro chaque jour (`Heure.ino`). |
+| `On`, `H_Ouvre` | État courant (relais fermé ?) et cumul total de temps d'ouverture équivalent (heures), conservé pour MQTT et les actions distantes. |
+| `H_OuvreRoutage`, `H_OuvreForce` | Cumuls de temps d'ouverture équivalent (heures) en régulation et hors régulation; remis à zéro chaque jour (`Heure.ino`). |
+| `PuissanceNominale` | Puissance nominale configurée de l'action (W), utilisée pour calculer l'énergie équivalente affichée sur l'accueil. |
 | `Type[8]`, `Hdeb[8]`, `Hfin[8]` | Mode et plage horaire (heure décimale ×100) de chaque période. |
 | `Vmin[8]`, `Vmax[8]`, `ONouvre[8]` | Seuils de puissance (W) On/Off ou de régulation, et plafond d'ouverture (%) en mode forcé On. |
 | `Tinf[8]`, `Tsup[8]` | Garde-fous température (°C ×10, `-1600` = non utilisé) pour activer/désactiver la période. |
