@@ -27,6 +27,7 @@ Routeur photovoltaïque basé sur **ESP32**, permettant d’optimiser l’autoco
   - Visualisation en temps réel de la puissance, de la tension, du courant, de l’état des sorties.
   - Configuration des seuils, horaires, priorités, et paramètres réseau.
   - Historique et graphiques accessibles via navigateur.
+  - Page de résumé rapide sans graphiques ni navigation : ouvrir `/rapide` pour consulter les énergies du jour, les températures, l’état et l’ouverture équivalente des actions, et, avec la source Zendure, les puissances secteur/batterie et le niveau de batterie. Les actions peuvent aussi être forcées On/Off depuis cette page.
 
 - 🖥️ **Affichage local (selon version)**
   - Écran couleur 320×240  en option affichant les mesures instantanées et l’état des charges.

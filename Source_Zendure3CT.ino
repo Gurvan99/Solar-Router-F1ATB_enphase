@@ -4,8 +4,7 @@
 // *   GET http://<IP>/properties/report                *
 // * Seule la phase A (a_aprt_power) sert au routage ;    *
 // * b_aprt_power/c_aprt_power/total_power sont ignorés   *
-// * pour le calcul (visibles uniquement dans le JSON     *
-// * brut affiché en page "Données brutes"). L'appareil   *
+// * pour le calcul et ne sont plus affichés. L'appareil *
 // * ne fournit pas de tension, fixée arbitrairement à     *
 // * 220V.                                                *
 // ******************************************************
@@ -14,6 +13,9 @@
 void LectureZendure3CT() {
   static unsigned long LastZendureMillis = 0;  // pour l'intégration logicielle de l'énergie
   // Initialisation des mesures batterie comme invalides
+  PowerSecteur = -1;
+  PwBattery = 0;
+  ZendurePowerValide = false;
   PwBatteryCharge = -1;
   BatteryStatus = -1;
 
@@ -56,10 +58,10 @@ void LectureZendure3CT() {
     return;
   }
   Zendure_Data = Zendure_Data.substring(p);
-  Zendure_dataBrute = "<strong>Zendure 3CT</strong><br>" + Zendure_Data;  // pour la page "Données brutes"
 
   float Pw = PfloatMax(ValJson("a_aprt_power", Zendure_Data));
-  float PwBattery = 0;
+  PowerSecteur = Pw;
+  ZendurePowerValide = true;
 
   // Lecture de la batterie Zendure (SolarFlow) si son IP est définie
   if (ZendureBatteryIP > 0) {
@@ -106,12 +108,21 @@ void LectureZendure3CT() {
         } else {
           StockMessage("electricLevel absent ou invalide (attendu 0-100) : " + batteryHost);
         }
-        //Zendure_dataBrute += "<br><strong>Batterie Zendure</strong><br>" + json;
       } else if (!timeoutBatterie) {
         StockMessage("packInputPower non trouvé sur : " + batteryHost + " (" + String(Battery_Data.length()) + " octets reçus)");
       }
     }
   }
+  String puissanceCharge = PwBatteryCharge >= 0
+      ? String(PwBatteryCharge, 1) + " W"
+      : "Indisponible";
+  String niveauBatterie = BatteryStatus >= 0
+      ? String(BatteryStatus) + " %"
+      : "Indisponible";
+  Zendure_dataBrute = "<strong>Zendure 3CT</strong><br>PowerSecteur : " + String(PowerSecteur, 1) +
+      " W<br>PwBattery : " + String(PwBattery, 1) +
+      " W<br>PwBatteryCharge : " + puissanceCharge +
+      "<br>BatteryStatus : " + niveauBatterie;
   float voltage = 220;
 
   // La décharge de la batterie (packInputPower) est comptée comme une consommation : le

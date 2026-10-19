@@ -7,6 +7,8 @@ String ConfImport;
 void Init_Server() {
   // Init Web Server on port 80
   server.on("/", handleRoot);
+  server.on("/rapide", handleRapide);
+  server.on("/ajax_rapide", handleAjaxRapide);
   server.on("/MainJS1", handleMainJS1);
   server.on("/MainJS2", handleMainJS2);
   server.on("/MainJS3", handleMainJS3);
@@ -159,6 +161,84 @@ void Init_Server() {
 void handleRoot() {  // Pages principales
 
   server.send(200, "text/html", MainHtml);
+}
+void handleRapide() {
+  server.sendHeader("Cache-Control", "no-store");
+  server.send(200, "text/html", PageRapide);
+}
+void handleAjaxRapide() {
+  JsonDocument doc;
+  const bool compteurSecondaire = nomSondeFixe != "" &&
+      (Source_data == "UxIx2" ||
+       ((Source_data == "ShellyEm" || Source_data == "ShellyPro") && EnphaseSerial.toInt() != 3));
+
+  doc["date"] = DATE;
+  doc["soutiree"] = EnergieJour_M_Soutiree;
+  doc["injectee"] = EnergieJour_M_Injectee;
+  doc["zendure"] = Source_data == "Zendure";
+  if (Source_data == "Zendure") {
+    if (ZendurePowerValide) {
+      doc["PowerSecteur"] = PowerSecteur;
+    } else {
+      doc["PowerSecteur"] = nullptr;
+    }
+    doc["PwBattery"] = PwBattery;
+    if (PwBatteryCharge >= 0) {
+      doc["PwBatteryCharge"] = PwBatteryCharge;
+    } else {
+      doc["PwBatteryCharge"] = nullptr;
+    }
+    if (BatteryStatus >= 0) {
+      doc["BatteryStatus"] = BatteryStatus;
+    } else {
+      doc["BatteryStatus"] = nullptr;
+    }
+  }
+  doc["secondaire"] = compteurSecondaire;
+  if (compteurSecondaire) {
+    doc["soutireeSecondaire"] = EnergieJour_T_Soutiree;
+    doc["injecteeSecondaire"] = EnergieJour_T_Injectee;
+  }
+
+  JsonArray temperaturesJson = doc["temperatures"].to<JsonArray>();
+  for (int canal = 0; canal < 4; canal++) {
+    if (Source_Temp[canal] == "tempNo") continue;
+    JsonObject mesure = temperaturesJson.add<JsonObject>();
+    mesure["nom"] = nomTemperature[canal];
+    if (TemperatureValide[canal] > 0 && temperature[canal] > -100) {
+      mesure["valeur"] = temperature[canal];
+    } else {
+      mesure["valeur"] = nullptr;
+    }
+  }
+
+  JsonArray actionsJson = doc["actions"].to<JsonArray>();
+  for (int i = 0; i < NbActions; i++) {
+    if (LesActions[i].Actif <= 0 || (ITmode == 0 && i == 0)) continue;
+
+    JsonObject action = actionsJson.add<JsonObject>();
+    const bool commandeOnOff = LesActions[i].Actif == 1 && i > 0;
+    action["id"] = i;
+    action["nom"] = LesActions[i].Titre;
+    action["etat"] = commandeOnOff
+        ? (LesActions[i].On ? "On" : "Off")
+        : "Ouverture";
+    action["ouverture"] = commandeOnOff
+        ? (LesActions[i].On ? 100 : 0)
+        : 100 - Retard[i];
+    action["forcage"] = LesActions[i].tOnOff;
+    action["routageHeures"] = int(LesActions[i].H_OuvreRoutage * 100.0);
+    action["routageWh"] = static_cast<unsigned long>(
+        LesActions[i].PuissanceNominale * LesActions[i].H_OuvreRoutage + 0.5f);
+    action["forceHeures"] = int(LesActions[i].H_OuvreForce * 100.0);
+    action["forceWh"] = static_cast<unsigned long>(
+        LesActions[i].PuissanceNominale * LesActions[i].H_OuvreForce + 0.5f);
+  }
+
+  String reponse;
+  serializeJson(doc, reponse);
+  server.sendHeader("Cache-Control", "no-store");
+  server.send(200, "application/json", reponse);
 }
 void handleWifi() {
   lectureCookie(ConnectAP_Html);
@@ -465,7 +545,20 @@ void handleAjax_etatActions() {
   int Force = server.arg("Force").toInt();
   int NumAction = server.arg("NumAction").toInt();
   ExtraitCookie();
-  if (Force != 0 && NumAction < NbActions && CleAccesRef == CleAcces) {
+  if (Force != 0) {
+    if (Force != 1 && Force != -1) {
+      server.send(400, "text/plain", "Commande de forçage invalide.");
+      return;
+    }
+    if (CleAccesRef != CleAcces) {
+      server.send(403, "text/plain", "Accès refusé. Connectez-vous depuis la page Actions.");
+      return;
+    }
+    if (NumAction < 0 || NumAction >= NbActions ||
+        LesActions[NumAction].Actif == 0 || (ITmode == 0 && NumAction == 0)) {
+      server.send(400, "text/plain", "Action invalide ou inactive.");
+      return;
+    }
     if (Force > 0) {
       if (LesActions[NumAction].tOnOff < 0) {
         LesActions[NumAction].tOnOff = 0;

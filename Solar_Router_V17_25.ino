@@ -343,14 +343,18 @@
       CommunCouleurJS, BruteJS1/2) : ~70-75% de volume transféré en moins sur le WiFi, et accessoirement moins de
       flash utilisée (les sources JS lisibles sont maintenant dans web_assets/*.js, compilées en tableaux d'octets
       gzip par tools/build_gzip_assets.py — voir section Compilation du README).
-    Ajout du Mode Vacances (paramètres communs aux Actions et topic MQTT DeviceName/Vacances) :
+    - Ajout du Mode Vacances (paramètres communs aux Actions et topic MQTT DeviceName/Vacances) :
     Désactive automatiquement les plages horaires ON forcé (chauffe réseau) et les forçages de surchauffe
     température, tout en maintenant 100% actif le routage du surplus solaire.
     Prise en charge d'une date de fin ou d'un nombre de jours d'absence avec désactivation automatique à expiration.
-    Zendure : prise en compte de la puissance restituée par la batterie pour éviter de la détourner vers les
+    - Zendure : prise en compte de la puissance restituée par la batterie pour éviter de la détourner vers les
     actions en régulation. Possibilité de réserver un surplus configurable à la batterie, globalement et selon
     le seuil de température défini pour chaque action, afin de favoriser sa charge par rapport aux usages comme
     le chauffe-eau. Puissance minimale d'amorçage configurable (10 W par défaut).
+    - Affichage des puissances Zendure et de l'état de la batterie dans la page Résumé rapide.
+    Remplacement du JSON brut Zendure par ces quatre mesures dans les données brutes.
+    Amélioration de la page Résumé rapide : état et ouverture des actions, ouverture équivalente
+    en temps et en énergie, commandes de forçage On/Off et mesures Zendure.
 
 
 
@@ -403,6 +407,7 @@
 
 // Pages WEB
 #include "PageAccueil.h"
+#include "PageRapide.h"
 #include "JS_Accueil.h"
 #include "PageActions.h"
 #include "JS_Actions.h"
@@ -663,7 +668,7 @@ bool EASTvalid = false;
 bool EAITvalid = false;
 volatile int IdxDataRawLinky = 0;
 volatile int IdxBufDecodLinky = 0;
-volatile char DataRawLinky[10000];  //Buffer entrée données Linky
+volatile char DataRawLinky[1];  //Buffer entrée données Linky
 float moyPWS = 0;
 float moyPWI = 0;
 float moyPVAS = 0;
@@ -697,6 +702,9 @@ String EnphaseSerial = "0";  //Sert égalemnet au Shelly comme numéro de voie
 unsigned long ZendureBatteryIP = 0;  // Adresse IP de la batterie Zendure
 int ReserveBatterieZendure = 0;      // W réservés à la batterie Zendure (non routés) si T action >= TreserveBatt
 int AmorceBatterieZendure = 10;      // Puissance minimale d'amorçage réservée à la batterie Zendure (W)
+float PowerSecteur = -1;             // Puissance secteur Zendure (W). -1 = invalide
+float PwBattery = 0;                 // Puissance délivrée par la batterie Zendure (W)
+bool ZendurePowerValide = false;
 float PwBatteryCharge = -1;         // Puissance de charge de la batterie Zendure (outputPackPower). -1 = invalide
 int BatteryStatus = -1;             // Etat de charge batterie Zendure en % (electricLevel). -1 = invalide
 String EnvoySessionIdCookie = "";  // Cookie `sessionId` renvoyé par l'API Enphase Envoy pour les requêtes authentifiées, reutilisé pour accélerer les appels suivants (~25ms economisés par rapport a Bearer Token)
