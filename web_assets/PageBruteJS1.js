@@ -5,7 +5,9 @@
 
 let InitFait = false;
 let IdxMessage = 0;
+// LIGHT_EXCLUDE_BEGIN
 let MessageLinky = "";
+// LIGHT_EXCLUDE_END
 const BordsInverse = [".Bbrut"];
 
 // ============================================================================
@@ -27,6 +29,7 @@ const M = [
   ["Frequence", "Fréquence", "Hz", "Hz"]
 ];
 
+// LIGHT_EXCLUDE_BEGIN
 // ============================================================================
 // Tableaux Enphase
 // ============================================================================
@@ -147,6 +150,7 @@ function creerTableauLinky() {
   S += "</table>";
   GH("tableauLinky", S);
 }
+// LIGHT_EXCLUDE_END
 
 // ============================================================================
 // Récupération données ESP32

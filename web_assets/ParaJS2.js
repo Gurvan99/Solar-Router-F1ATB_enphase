@@ -30,7 +30,9 @@ function checkDisabled() {
  
     const pESP = GID("ESP").value;
 
-    if (GID("sources").value =="Linky") GID("Serial2V").value=9600; //vitesse Linky en mode standard 
+    // LIGHT_EXCLUDE_BEGIN
+    if (GID("sources").value =="Linky") GID("Serial2V").value=9600; //vitesse Linky en mode standard
+    // LIGHT_EXCLUDE_END
     GID("Vport_serie").style.display = (GID("Serie").value>0) ? "table-row": "none";
 
     // Mise à jour de l'affichage des boutons/lignes
@@ -64,6 +66,16 @@ function checkDisabled() {
     const isDisabledAP = (F.ModeReseau == 2);
     const isDisabledExpert = (F.ModePara == 0 || F.ModeReseau == 2);
 
+    // LIGHT_ONLY_BEGIN
+    for (const source of ["SmartG", "HomeW", "Zendure"]) {
+        const option = GID("sources").querySelector(`option[value="${source}"]`);
+        if (option) option.disabled = isDisabledAP;
+    }
+    const sourceExterne = GID("sources").querySelector('option[value="Ext"]');
+    if (sourceExterne) sourceExterne.disabled = isDisabledExpert;
+    // LIGHT_ONLY_END
+
+    // LIGHT_EXCLUDE_BEGIN
     for (let i = 5; i < 11; i++) {
         if (GID("sources").options[i]) {
             GID("sources").options[i].disabled = isDisabledAP;
@@ -72,6 +84,7 @@ function checkDisabled() {
     if (GID("sources").options[11]) {
         GID("sources").options[11].disabled = isDisabledExpert;
     }
+    // LIGHT_EXCLUDE_END
 
     // Désactivation des options de température par canal
     for (let i = 0; i < 4; i++) {
@@ -177,7 +190,11 @@ function checkIP(id) {
  */
 function AdaptationSource() {
     // Visibilité des options de nom (Fixe)
-    const isSourceDual = (V.Source_data === 'UxIx2' || ((V.Source_data === 'ShellyEm' || V.Source_data === 'ShellyPro') && GID("EnphaseSerial").value != 3));
+    const isSourceDual = (V.Source_data === 'UxIx2'
+    // LIGHT_EXCLUDE_BEGIN
+        || ((V.Source_data === 'ShellyEm' || V.Source_data === 'ShellyPro') && GID("EnphaseSerial").value != 3)
+    // LIGHT_EXCLUDE_END
+    );
     GID('ligneFixe').style.display = isSourceDual ? "table-row" : "none";
     GID('ligneFixe1').style.display = isSourceDual ? "table-row" : "none";
     GID('ligneFixe2').style.display = isSourceDual ? "table-row" : "none";
@@ -187,23 +204,30 @@ function AdaptationSource() {
     GID('Zcalib').style.display = isSourceUxI ? "table" : "none";
     GID('Analog').style.display = isSourceUxI ? "table-row" : "none";
     
-    // Visibilité des options Linky/CACSI
+    // LIGHT_EXCLUDE_BEGIN
+    // Visibilité de l'estimateur d'injection pour Linky/CACSI
     GID('CACSI').style.display = (F.Source === 'Linky') ? "table" : "none";
+    // LIGHT_EXCLUDE_END
     
     // Détermination des libellés d'IP externe
     let txtExt = "ESP-RMS";
+    // LIGHT_EXCLUDE_BEGIN
     let lab_enphaseShelly = "Numéro série passerelle IQ Enphase : <span class='fsize10'><br>Pour firmvare Envoy-S V7 seulement</span>";
+    // LIGHT_EXCLUDE_END
     
     switch (F.Source) {
+        // LIGHT_EXCLUDE_BEGIN
         case 'Enphase':
             txtExt = "Enphase-Envoy";
             break;
+        // LIGHT_EXCLUDE_END
         case 'SmartG':
             txtExt = "SmartGateways";
             break;
         case 'HomeW':
             txtExt = "HomeWizard";
             break;
+        // LIGHT_EXCLUDE_BEGIN
         case 'ShellyEm':
         case 'ShellyPro':
             txtExt = "Shelly (Pro) Em ";
@@ -215,6 +239,7 @@ function AdaptationSource() {
                                  Triphasé 3EM-63 : voie = 63</div>`;
                                  
             break;
+        // LIGHT_EXCLUDE_END
         case 'Zendure':
             txtExt = "Zendure 3CT";
             break;
@@ -222,17 +247,25 @@ function AdaptationSource() {
     
     // Mise à jour des libellés
     GH('labExtIp', txtExt);
+    // LIGHT_EXCLUDE_BEGIN
     GH('label_enphase_shelly', lab_enphaseShelly);
+    // LIGHT_EXCLUDE_END
 
     // Visibilité de la ligne d'IP externe/Référence
-    const isExternalSource = ['Ext', 'Enphase', 'SmartG', 'HomeW', 'ShellyEm', 'ShellyPro', 'Zendure'].includes(F.Source);
+    const isExternalSource = ['Ext', 'SmartG', 'HomeW', 'Zendure'
+    // LIGHT_EXCLUDE_BEGIN
+        , 'Enphase', 'ShellyEm', 'ShellyPro'
+    // LIGHT_EXCLUDE_END
+    ].includes(F.Source);
     GID('ligneExt').style.display = isExternalSource ? "table-row" : "none";
+    // LIGHT_EXCLUDE_BEGIN
     GID('ligneExtIPauto').style.display = F.Source === 'Enphase' ? "table-row" : "none";
 
     // Visibilité des options d'authentification/série Enphase/Shelly
     GID('ligneEnphaseUser').style.display = (F.Source === 'Enphase') ? "table-row" : "none";
     GID('ligneEnphasePwd').style.display = (F.Source === 'Enphase') ? "table-row" : "none";
     GID('ligneEnphaseSerial').style.display = (F.Source === 'Enphase' || F.Source === 'ShellyEm' || F.Source === 'ShellyPro') ? "table-row" : "none";
+    // LIGHT_EXCLUDE_END
     // Visibilité de l'IP de la batterie Zendure
     GID('ligneZendureBatteryIP').style.display = (F.Source === 'Zendure') ? "table-row" : "none";
     GID('ligneZendureReserve').style.display = (F.Source === 'Zendure') ? "table-row" : "none";

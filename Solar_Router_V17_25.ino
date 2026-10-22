@@ -1,4 +1,4 @@
-#define Version "17.27"  //
+#define Version "17.29"  //
 #define HOSTNAME "RMS-ESP32-"
 
 
@@ -355,6 +355,10 @@
     Remplacement du JSON brut Zendure par ces quatre mesures dans les données brutes.
     Amélioration de la page Résumé rapide : état et ouverture des actions, ouverture équivalente
     en temps et en énergie, commandes de forçage On/Off et mesures Zendure.
+  - Version 17.29 (22/10/2026)
+    Variante esp32dev-light : retrait des options, réglages et scripts liés aux sources non
+    compilées (Enphase Envoy, Linky, UxIx3, Shelly EM et Shelly Pro EM) des pages Paramètres
+    et Données brutes.
 
 
 
@@ -1372,9 +1376,11 @@ void setup() {
     Setup_UxI();
   }
 
+#ifndef ROUTEUR_BUILD_LIGHT
   if (Source == "Enphase") {
     Setup_Enphase();
   }
+#endif
 
 
   if (Source == "Pmqtt") {
@@ -1388,9 +1394,11 @@ void setup() {
       Setup_UxIx2();
     }
 
+#ifndef ROUTEUR_BUILD_LIGHT
     if (Source == "Linky") {
       Setup_Linky();
     }
+#endif
   }
 
   if (Source == "Ext") {
@@ -1492,6 +1500,7 @@ void Task_LectureRMS(void *pvParameters) {
           LectureUxIx2();
           PeriodeProgMillis = 400;
         }
+#ifndef ROUTEUR_BUILD_LIGHT
         if (Source == "UxIx3") {
           Lecture_JSY333();
           PeriodeProgMillis = 800;
@@ -1501,12 +1510,15 @@ void Task_LectureRMS(void *pvParameters) {
           LectureLinky();
           PeriodeProgMillis = 2;
         }
+#endif
       }
+#ifndef ROUTEUR_BUILD_LIGHT
       if (Source == "Enphase") {
         LectureEnphase();
         LastRMS_Millis = millis();
         PeriodeProgMillis = 300 + ralenti;  //On s'adapte à la vitesse réponse Envoy-S metered
       }
+#endif
       if (Source == "SmartG") {
         LectureSmartG();
         LastRMS_Millis = millis();
@@ -1517,6 +1529,7 @@ void Task_LectureRMS(void *pvParameters) {
         LastRMS_Millis = millis();
         PeriodeProgMillis = 300 + ralenti;  //On s'adapte à la vitesse réponse HomeWizard
       }
+#ifndef ROUTEUR_BUILD_LIGHT
       if (Source == "ShellyEm") {
         LectureShellyEm();
         LastRMS_Millis = millis();
@@ -1527,6 +1540,7 @@ void Task_LectureRMS(void *pvParameters) {
         LastRMS_Millis = millis();
         PeriodeProgMillis = 300 + ralenti;  //On adapte  la vitesse pour ne pas surchargé Wifi
       }
+#endif
       if (Source == "Zendure") {
         LectureZendure3CT();
         LastRMS_Millis = millis();

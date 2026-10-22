@@ -105,11 +105,19 @@ function SetParaFixe() {
     // Autres paramètres
     GID("ModeW").value = F.ModeReseau;
     GID("sources").value = F.Source;
+    // LIGHT_ONLY_BEGIN
+    if (GID("sources").value === "") {
+        GID("sources").value = "NotDef";
+        F.Source = "NotDef";
+    }
+    // LIGHT_ONLY_END
     GID("RMSextIP").value = int2ip(F.RMSextIP);
+    // LIGHT_EXCLUDE_BEGIN
     GID("RMSextIPauto").checked = F.RMSextIPauto == 1;
     GID("EnphaseUser").value = F.EnphaseUser;
     GID("EnphasePwd").value = F.EnphasePwd;
     GID("EnphaseSerial").value = F.EnphaseSerial;
+    // LIGHT_EXCLUDE_END
     GID("ZendureBatteryIP").value = int2ip(F.ZendureBatteryIP);
     GID("ReserveBatterieZendure").value = F.ReserveBatterieZendure || 0;
     GID("AmorceBatterieZendure").value = F.AmorceBatterieZendure === undefined ? 10 : F.AmorceBatterieZendure;
@@ -146,7 +154,9 @@ function SetParaFixe() {
     GID("NumPageBoot").value = F.NumPageBoot;
     GID("pUxI").value = F.pUxI;
     GID("PTemp").value = F.pTemp;
+    // LIGHT_EXCLUDE_BEGIN
     GID("EstimCACSI").checked = (F.ReacCACSI == 100)? true:false; 1;
+    // LIGHT_EXCLUDE_END
 
     // --- Paramètres de Température (LesParas[1] à LesParas[4]) ---
     const NbCanauxTemp = 4;
@@ -191,13 +201,17 @@ function SendValues() {
   F.NumPageBoot = GID("NumPageBoot").value;
   F.pUxI = GID("pUxI").value;
   F.pTemp = GID("PTemp").value;
-  F.ReacCACSI = GID("EstimCACSI").checked ? 100 : 0; 
+  // LIGHT_EXCLUDE_BEGIN
+  F.ReacCACSI = GID("EstimCACSI").checked ? 100 : 0;
+  // LIGHT_EXCLUDE_END
   F.Source=GID("sources").value;
   if (F.ModePara == 0) { //Non Expert
     F.subMQTT = 0; F.WifiSleep = 1;
   }
   F.RMSextIP = ip2int(GID("RMSextIP").value);
+  // LIGHT_EXCLUDE_BEGIN
   F.RMSextIPauto = GID("RMSextIPauto").checked ? 1 : 0;
+  // LIGHT_EXCLUDE_END
   F.ZendureBatteryIP = ip2int(GID("ZendureBatteryIP").value);
   F.ReserveBatterieZendure = parseInt(GID("ReserveBatterieZendure").value, 10) || 0;
   F.AmorceBatterieZendure = parseInt(GID("AmorceBatterieZendure").value, 10) || 0;
@@ -205,9 +219,11 @@ function SendValues() {
   F.masque = ip2int(GID("masque").value);
   F.dns = ip2int(GID("dns").value);
 
+  // LIGHT_EXCLUDE_BEGIN
   F.EnphaseUser = GID("EnphaseUser").value ;
   F.EnphasePwd = GID("EnphasePwd").value ;
   F.EnphaseSerial = GID("EnphaseSerial").value ;
+  // LIGHT_EXCLUDE_END
 
   F.nomRouteur =GID("nomRouteur").value.trim() ;
   F.nomSondeFixe = GID("nomSondeFixe").value.trim();

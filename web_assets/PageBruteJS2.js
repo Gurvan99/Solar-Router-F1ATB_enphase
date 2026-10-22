@@ -131,6 +131,7 @@ async function LoadData() {
                 }
                 break;
 
+            // LIGHT_EXCLUDE_BEGIN
             case "Enphase":
                 GID('infoEnphase').style.display = "block";
                 const G1_Enphase = groupes[1].split(RS);
@@ -147,6 +148,7 @@ async function LoadData() {
                     }
                 }
                 break;
+            // LIGHT_EXCLUDE_END
 
             case "SmartG":
                 GID('infoSmartG').style.display="block";
@@ -168,6 +170,7 @@ async function LoadData() {
                 }
                 GH('dataHomeW', Sw);
                 break;
+            // LIGHT_EXCLUDE_BEGIN
             case "ShellyEm":
             case "ShellyPro":
                 
@@ -182,6 +185,7 @@ async function LoadData() {
                 }
                 GH('dataShellyEm', Ss);
                 break;
+            // LIGHT_EXCLUDE_END
 
             case "Zendure":
                 GID('infoZendure').style.display="block";
@@ -194,15 +198,18 @@ async function LoadData() {
                 GH('dataZendure', Sz);
                 break;
 
+            // LIGHT_EXCLUDE_BEGIN
             case "UxIx3":
                 GID('infoUxIx3').style.display="block";
                 GH('dataUxIx3', groupes[1]);
                 break;
+            // LIGHT_EXCLUDE_END
             case "Pmqtt":
                 GID('infoPmqtt').style.display="block";
                 GH('dataPmqtt', groupes[1]);
                 break;
 
+            // LIGHT_EXCLUDE_BEGIN
             case "Linky":
                 GID('infoLinky').style.display = "block";
                 if (!InitFait) {
@@ -267,6 +274,7 @@ async function LoadData() {
                 // Mettre à jour l'index de message pour la prochaine requête
                 IdxMessage = groupes[2];
                 break;
+            // LIGHT_EXCLUDE_END
                 
             default:
                 // Si la Source_data est inconnue, ne rien faire

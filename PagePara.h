@@ -23,7 +23,14 @@ const char *ParaHtml = R"====(
     .Bparametres { border: inset 10px azure; }
     .Bgeneraux { border: inset 4px azure; }
     #BoutonsBas { text-align:center; display: flex;justify-content: space-around;}
-    #ligneFixe, .ligneTemperature, #ligneExt,#ligneExtIPauto, #ligneEnphaseUser, #ligneEnphasePwd, #ligneEnphaseSerial,
+    #ligneFixe, .ligneTemperature, #ligneExt,
+)===="
+#ifndef ROUTEUR_BUILD_LIGHT
+R"====(
+    #ligneExtIPauto, #ligneEnphaseUser, #ligneEnphasePwd, #ligneEnphaseSerial,
+)===="
+#endif
+R"====(
     #ligneZendureBatteryIP, #ligneZendureReserve, #ligneZendureAmorce, #infoIP, #ligneTopicP, #ligneTopicT { display:none; }
     .Zone, .generaux { width:100%; border:1px solid grey; border-radius:10px; margin-top:10px;
                        background-color:rgba(30,30,30,0.3); }
@@ -179,7 +186,12 @@ const char *ParaHtml = R"====(
         </div>
 
         <div class="ligne" id="port_serie">
-          <label for="Serie">Port série 2 <span class="fsize10">Pour UxIx2, UxIx3 ou Linky</span></label>
+          <label for="Serie">Port série 2 <span class="fsize10">Pour UxIx2
+)===="
+#ifndef ROUTEUR_BUILD_LIGHT
+R"====(, UxIx3 ou Linky)===="
+#endif
+R"====(</span></label>
           <select id="Serie" onclick="checkDisabled();">
             <option value="0" selected>Non utilisé</option>
             <option value="1">RX=gpio 16, TX=gpio 17</option>
@@ -191,7 +203,12 @@ const char *ParaHtml = R"====(
         </div>
 
         <div class="ligne" id="Vport_serie">
-          <label for="Serial2V">Vitesse Port série 2 <span class="fsize10">Défaut : UxIx2=4800, UxIx3=9600, Linky=9600</span></label>
+          <label for="Serial2V">Vitesse Port série 2 <span class="fsize10">Défaut : UxIx2=4800
+)===="
+#ifndef ROUTEUR_BUILD_LIGHT
+R"====(, UxIx3=9600, Linky=9600)===="
+#endif
+R"====(</span></label>
           <select id="Serial2V" onclick="checkDisabled();">
             <option value="0" selected>Pas utilisé</option>
             <option value="4800">4800 bauds</option>
@@ -349,13 +366,25 @@ const char *ParaHtml = R"====(
             <option value="NotDef" selected>Non définie</option>
             <option value="UxI">UxI</option>
             <option value="UxIx2">UxIx2</option>
+)===="
+#ifndef ROUTEUR_BUILD_LIGHT
+R"====(
             <option value="UxIx3">UxIx3</option>
             <option value="Linky">Linky</option>
             <option value="Enphase">Enphase-Envoy</option>
+)===="
+#endif
+R"====(
             <option value="SmartG">SmartGateways</option>
             <option value="HomeW">HomeWizard</option>
+)===="
+#ifndef ROUTEUR_BUILD_LIGHT
+R"====(
             <option value="ShellyEm">Shelly Em</option>
             <option value="ShellyPro">Shelly Pro Em</option>
+)===="
+#endif
+R"====(
             <option value="Zendure">Zendure 3CT</option>
             <option value="Ext">ESP Externe</option>
             <option value="Pmqtt">MQTT</option>
@@ -370,6 +399,9 @@ const char *ParaHtml = R"====(
           <label for="RMSextIP">Adresse IP <span id="labExtIp"></span> externe :</label>
           <input type="text" id="RMSextIP" name="RMSextIP" autocomplete="on">
         </div>
+)===="
+#ifndef ROUTEUR_BUILD_LIGHT
+R"====(
         <div class="ligne" id="ligneExtIPauto">
           <label for="RMSextIPauto">Adresse IP auto par résolution mDNS :</label>
           <input type="checkbox" id="RMSextIPauto" name="RMSextIPauto" style="width:25px;" >
@@ -393,7 +425,9 @@ const char *ParaHtml = R"====(
           <input type="text" id="EnphaseSerial" name="EnphaseSerial"
                 onchange="checkDisabled();" autocomplete="on">
         </div>
-
+)===="
+#endif
+R"====(
         <div class="ligne" id="ligneZendureBatteryIP">
           <label for="ZendureBatteryIP">Adresse IP de la batterie Zendure :</label>
           <input type="text" id="ZendureBatteryIP" name="ZendureBatteryIP" autocomplete="on">
@@ -420,6 +454,9 @@ const char *ParaHtml = R"====(
 
       </div>
 
+)===="
+#ifndef ROUTEUR_BUILD_LIGHT
+R"====(
       <div id="CACSI" class="form">
         <div class="ligne">
           <label for="EstimCACSI">Estimateur injection si CACSI :</label>
@@ -428,7 +465,9 @@ const char *ParaHtml = R"====(
                 title="Estimation des injections basée sur les V*A données par le LINKY">
         </div>
       </div>
-
+)===="
+#endif
+R"====(
     </div>
 
     <div class="Zone" id="LesSourcesTemp">

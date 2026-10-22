@@ -102,6 +102,9 @@ python tools/build_gzip_assets.py
 Ce script ne nécessite que la bibliothèque standard Python (pas de dépendance à installer). Les
 fichiers `web_assets/generated/*_gz.h` sont auto-générés (ne pas les éditer à la main) — pensez à
 les committer après régénération, ils sont compilés tels quels par PlatformIO/Arduino IDE.
+Les scripts Paramètres et Données brutes disposent aussi de variantes light générées à partir
+des marqueurs `LIGHT_EXCLUDE` / `LIGHT_ONLY`, pour retirer le JavaScript dédié aux sources exclues
+de `esp32dev-light` sans embarquer les scripts complets correspondants dans ce firmware.
 
 ### Option recommandée : PlatformIO (VS Code ou ligne de commande)
 
@@ -123,6 +126,19 @@ pio run              # compile le firmware (.pio/build/esp32dev/firmware.bin)
 pio run -t upload    # compile + flashe l'ESP32 connecté en USB
 pio device monitor    # ouvre le moniteur série
 ```
+
+Une variante allégée est disponible en complément, sans modifier la cible complète :
+```powershell
+pio run -e esp32dev-light
+pio run -e esp32dev-light -t upload
+```
+Elle conserve Zendure 3CT, UxI, UxIx2, SmartGateways, HomeWizard, MQTT et ESP externe ; elle
+retire Enphase-Envoy, Linky, UxIx3 et Shelly EM/Pro de la compilation et du choix des sources.
+Les pages Paramètres et Données brutes de cette variante omettent également les réglages,
+panneaux et scripts propres à ces sources exclues.
+Cette option vise surtout à réduire la taille du firmware et peut accélérer légèrement les
+compilations complètes. Elle ne devrait pas améliorer la vitesse d'exécution ni réduire notablement
+la RAM lorsque Zendure est utilisé.
 
 **⚠️ Si plusieurs versions de Python sont installées sur le PC** (ex. un ancien Python 3.8 à côté
 d'un Python ≥3.10) : la commande `pio` du PATH peut être un raccourci généré par la mauvaise

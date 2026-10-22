@@ -20,7 +20,14 @@ const char *PageBrute = R"====(
     .phi { background-color: #ffd; }
     .V { background-color: #ee8; }
     .VA { background-color: #dfd; }
-    .Hz, .Enph { background-color: #eeb; }
+    .Hz { background-color: #eeb; }
+)===="
+#ifndef ROUTEUR_BUILD_LIGHT
+R"====(
+    .Enph { background-color: #eeb; }
+)===="
+#endif
+R"====(
 
     .titre {
       background-color: #ccc;
@@ -62,22 +69,30 @@ const char *PageBrute = R"====(
 
     /* Sections masquées par défaut */
     #infoUxIx2,
-    #infoUxIx3,
     #infoUxI,
     #infoNotDef,
-    #infoLinky,
-    #infoEnphase,
     #infoSmartG,
     #infoHomeW,
-    #infoShellyEm,
     #infoZendure,
     #infoPmqtt {
+      display: none;
+    }
+)===="
+#ifndef ROUTEUR_BUILD_LIGHT
+R"====(
+    #infoUxIx3,
+    #infoLinky,
+    #infoEnphase,
+    #infoShellyEm {
       display: none;
     }
     #DataLinky{
       font-size:14px;
       tab-size:10;
     }
+)===="
+#endif
+R"====(
     #donneeDistante {
       font-size: 50%;
       text-align: center;
@@ -132,6 +147,9 @@ const char *PageBrute = R"====(
     <div id="tableau" class="tableau"></div>
   </div>
 
+)===="
+#ifndef ROUTEUR_BUILD_LIGHT
+R"====(
   <!-- JSY-MK-333 -->
   <div id="infoUxIx3">
     <div>Données brutes capteur JSY-MK-333</div>
@@ -162,6 +180,9 @@ const char *PageBrute = R"====(
     <div>Données Shelly Em</div>
     <div id="dataShellyEm" class="tableau dataIn"></div>
   </div>
+)===="
+#endif
+R"====(
 
   <!-- Zendure 3CT -->
   <div id="infoZendure">
@@ -175,6 +196,9 @@ const char *PageBrute = R"====(
     <div id="dataPmqtt" class="tableau dataIn"></div>
   </div>
 
+)===="
+#ifndef ROUTEUR_BUILD_LIGHT
+R"====(
   <!-- Linky -->
   <div id="infoLinky">
     <div id="dateLinky"></div>
@@ -183,7 +207,9 @@ const char *PageBrute = R"====(
     <div>Données brutes Linky en mode standard</div>
     <div id="DataLinky" class="tableau dataIn"></div>
   </div>
-
+)===="
+#endif
+R"====(
   <div id="donneeDistante">Données distantes</div>
 
   <!-- Données ESP32 -->
