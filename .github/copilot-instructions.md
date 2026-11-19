@@ -71,9 +71,10 @@ build script, task runner, test suite, or linter in the repo.
 - **Code, comments, and UI strings are in French** (variable/function names like `LesActions`,
   `EnergieQuotidienne`, `handleActions`, `RAZ` = "remise à zéro" i.e. reset). Match this language
   for new identifiers and comments in this codebase.
-- **Versioning**: bump `#define Version "X.Y"` at the top of `Solar_Router_V17_25.ino` and add a
-  dated entry to the "Historique des versions" section in `README.md` (French, one bullet list per
-  version) for any user-visible or behavioral change — this is the project's only changelog.
+- **Versioning**: never change `#define Version "X.Y"` at the top of `Solar_Router_V17_25.ino`
+  unless the user explicitly requests a version change. Document user-visible or behavioral
+  changes in the "Historique des versions" section in `README.md` without changing the firmware
+  version unless asked.
 - Global config knobs (buffer sizes, mode enums, memory offsets like `adr_HistoAn`) are `#define`d
   near the top of the main `.ino`; several are annotated "Ne pas toucher" (don't touch) because the
   JavaScript/web UI depends on the exact value (e.g. `LES_ACTIONS_LENGTH`, `LES_ROUTEURS_MAX`).

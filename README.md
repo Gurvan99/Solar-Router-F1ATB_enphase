@@ -175,3 +175,7 @@ py -3.13 -m platformio device monitor
 - Le premier build PlatformIO retéléchargera toutes les dépendances (plateforme, toolchain, bibliothèques) : rien n'est committé dans `.pio/` (ignoré via `.gitignore`).
 - Les fichiers de configuration Enphase (`PC_Tools/EnphaseMonitor/enphase_config.json`, `enphase_token_cache.json`) contiennent des secrets et **ne sont pas versionnés** : à recréer localement à partir de `enphase_config.example.json` si l'outil PC est utilisé sur ce nouveau poste.
 - La configuration WiFi/MQTT/etc. du routeur lui-même n'est pas stockée dans le code : elle se fait depuis l'interface Web de l'ESP32 après le premier démarrage (ou via import/export JSON, voir menu Paramètres du routeur).
+
+## Historique des versions
+
+- **Correctifs (19/11/2026, version firmware inchangée)** : remise à zéro à 23 h 30 et sauvegarde périodique des cumuls d'ouverture équivalente; restauration uniquement pour la journée opérationnelle correspondante (de 23 h 30 à 23 h 30); correction du surcomptage de cette durée lorsque la boucle prend du retard.

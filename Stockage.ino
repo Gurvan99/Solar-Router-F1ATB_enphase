@@ -1,7 +1,174 @@
 // Stockage.ino
 
 #include <Arduino.h>
+#include <math.h>
 String Record_Conf = "";
+static String DateJourneeCumulsOuverture = "";
+static unsigned long DerniereTentativeCumulsOuvertureMillis = 0;
+
+String DateOperationnelleCumulsOuverture() {
+  time_t maintenant;
+  time(&maintenant);
+  struct tm heureLocale;
+  if (!localtime_r(&maintenant, &heureLocale) || heureLocale.tm_year < 120) return "";
+
+  if (heureLocale.tm_hour < 23 ||
+      (heureLocale.tm_hour == 23 && heureLocale.tm_min < 30)) {
+    heureLocale.tm_mday--;
+    time_t veille = mktime(&heureLocale);
+    if (veille == -1 || !localtime_r(&veille, &heureLocale)) return "";
+  }
+
+  char date[9];
+  if (strftime(date, sizeof(date), "%Y%m%d", &heureLocale) != 8) return "";
+  return String(date);
+}
+
+bool EnregistrerCumulsOuverture() {
+  String date = DateOperationnelleCumulsOuverture();
+  if (date == "") return false;
+  if (NbActions < 0 || NbActions > LES_ACTIONS_LENGTH) {
+    Serial.println("Nombre d'actions invalide pour la sauvegarde des cumuls d'ouverture");
+    StockMessage("Cumuls d'ouverture non sauvegardés");
+    return false;
+  }
+
+  JsonDocument document;
+  document["dateJournee"] = date;
+  JsonArray actions = document["actions"].to<JsonArray>();
+  for (int i = 0; i < NbActions; i++) {
+    float total = LesActions[i].H_Ouvre;
+    float routage = LesActions[i].H_OuvreRoutage;
+    float force = LesActions[i].H_OuvreForce;
+    if (!isfinite(total) || !isfinite(routage) || !isfinite(force) ||
+        total < 0 || routage < 0 || force < 0 ||
+        total > 25 || routage > 25 || force > 25) {
+      Serial.println("Valeur hors limites, cumuls d'ouverture non sauvegardés");
+      StockMessage("Cumuls d'ouverture non sauvegardés");
+      return false;
+    }
+
+    JsonObject action = actions.add<JsonObject>();
+    action["total"] = total;
+    action["routage"] = routage;
+    action["force"] = force;
+  }
+
+  File fichier = LittleFS.open("/cumuls_ouverture.json", FILE_WRITE);
+  if (!fichier) {
+    Serial.println("Erreur d'ouverture du fichier cumuls_ouverture.json en écriture");
+    StockMessage("Erreur d'écriture des cumuls d'ouverture");
+    return false;
+  }
+
+  String contenu;
+  serializeJson(document, contenu);
+  size_t ecrits = fichier.print(contenu);
+  fichier.close();
+  if (ecrits != contenu.length()) {
+    Serial.println("Erreur d'écriture du fichier cumuls_ouverture.json");
+    StockMessage("Erreur d'écriture des cumuls d'ouverture");
+    return false;
+  }
+
+  DateJourneeCumulsOuverture = date;
+  DerniereTentativeCumulsOuvertureMillis = millis();
+  return true;
+}
+
+void LireCumulsOuverture(const String &dateAttendue) {
+  if (!LittleFS.exists("/cumuls_ouverture.json")) return;
+
+  File fichier = LittleFS.open("/cumuls_ouverture.json", "r");
+  if (!fichier) {
+    Serial.println("Erreur d'ouverture du fichier cumuls_ouverture.json en lecture");
+    StockMessage("Erreur de lecture des cumuls d'ouverture");
+    return;
+  }
+
+  JsonDocument document;
+  DeserializationError erreur = deserializeJson(document, fichier);
+  fichier.close();
+  if (erreur) {
+    Serial.print("Erreur de parsing de cumuls_ouverture.json: ");
+    Serial.println(erreur.c_str());
+    StockMessage("Erreur de lecture des cumuls d'ouverture");
+    return;
+  }
+
+  if (!document["dateJournee"].is<const char *>()) {
+    Serial.println("Date manquante ou invalide dans cumuls_ouverture.json");
+    StockMessage("Cumuls d'ouverture sauvegardés invalides");
+    return;
+  }
+  if (document["dateJournee"].as<String>() != dateAttendue) {
+    Serial.println("Sauvegarde des cumuls d'ouverture d'une autre journée ignorée");
+    return;
+  }
+
+  JsonArrayConst actions = document["actions"].as<JsonArrayConst>();
+  if (NbActions < 0 || NbActions > LES_ACTIONS_LENGTH ||
+      actions.isNull() || actions.size() != NbActions) {
+    Serial.println("Nombre d'actions invalide dans cumuls_ouverture.json");
+    StockMessage("Cumuls d'ouverture sauvegardés invalides");
+    return;
+  }
+
+  float total[LES_ACTIONS_LENGTH];
+  float routage[LES_ACTIONS_LENGTH];
+  float force[LES_ACTIONS_LENGTH];
+  for (int i = 0; i < NbActions; i++) {
+    JsonObjectConst action = actions[i];
+    if (!action["total"].is<float>() || !action["routage"].is<float>() || !action["force"].is<float>()) {
+      Serial.println("Valeur manquante ou invalide dans cumuls_ouverture.json");
+      StockMessage("Cumuls d'ouverture sauvegardés invalides");
+      return;
+    }
+
+    total[i] = action["total"].as<float>();
+    routage[i] = action["routage"].as<float>();
+    force[i] = action["force"].as<float>();
+    if (!isfinite(total[i]) || !isfinite(routage[i]) || !isfinite(force[i]) ||
+        total[i] < 0 || routage[i] < 0 || force[i] < 0 ||
+        total[i] > 25 || routage[i] > 25 || force[i] > 25) {
+      Serial.println("Valeur hors limites dans cumuls_ouverture.json");
+      StockMessage("Cumuls d'ouverture sauvegardés invalides");
+      return;
+    }
+  }
+
+  for (int i = 0; i < NbActions; i++) {
+    LesActions[i].H_Ouvre = total[i];
+    LesActions[i].H_OuvreRoutage = routage[i];
+    LesActions[i].H_OuvreForce = force[i];
+  }
+  Serial.println("Cumuls d'ouverture restaurés");
+}
+
+void GestionCumulsOuverture(unsigned long maintenant) {
+  if (!HeureValide) return;
+
+  String date = DateOperationnelleCumulsOuverture();
+  if (date == "") return;
+
+  if (date != DateJourneeCumulsOuverture) {
+    if (DateJourneeCumulsOuverture != "") {
+      for (int i = 0; i < LES_ACTIONS_LENGTH; i++) {
+        LesActions[i].H_Ouvre = 0;
+        LesActions[i].H_OuvreRoutage = 0;
+        LesActions[i].H_OuvreForce = 0;
+      }
+    }
+    DateJourneeCumulsOuverture = date;
+    LireCumulsOuverture(date);
+    DerniereTentativeCumulsOuvertureMillis = maintenant;
+  }
+
+  if (maintenant - DerniereTentativeCumulsOuvertureMillis >= 600000) {
+    DerniereTentativeCumulsOuvertureMillis = maintenant;
+    EnregistrerCumulsOuverture();
+  }
+}
 
 void EcritureEnROM() {
   if (ModePara == 0) {
@@ -313,6 +480,13 @@ void DeserializeConfiguration(String json) {
   pUxI = conf["pUxI"];
   pTemp = conf["pTemp"];
   Source = conf["Source"].as<String>();
+#ifdef ROUTEUR_BUILD_LIGHT
+  if (Source == "Enphase" || Source == "Linky" || Source == "UxIx3" ||
+      Source == "ShellyEm" || Source == "ShellyPro") {
+    StockMessage("Source " + Source + " absente de cette compilation ; source remise à Non définie");
+    Source = "NotDef";
+  }
+#endif
   RMSextIP = conf["RMSextIP"];
   RMSextIPauto = conf["RMSextIPauto"].isNull() ? RMSextIPauto : conf["RMSextIPauto"];
   ZendureBatteryIP = conf["ZendureBatteryIP"];

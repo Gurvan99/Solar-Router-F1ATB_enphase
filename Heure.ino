@@ -50,12 +50,14 @@ void JourHeureChange() {
   if (HeureValide) {
     FormatteHeureDate();
     HeureCouranteDeci = Int_Heure * 100 + Int_Minute * 10 / 6;
-    if (old_Heure == 5 && Int_Heure == 6) {
+    if ((old_Heure < 23 || (old_Heure == 23 && old_Minute < 30)) &&
+        Int_Heure == 23 && Int_Minute >= 30) {
       for (int i = 0; i < LES_ACTIONS_LENGTH; i++) {
-        LesActions[i].H_Ouvre = 0;  //RAZ temps equivalent ouverture à 6h du matin
+        LesActions[i].H_Ouvre = 0;  //RAZ temps equivalent ouverture à 23h30
         LesActions[i].H_OuvreRoutage = 0;
         LesActions[i].H_OuvreForce = 0;
       }
+      EnregistrerCumulsOuverture();
     }
     if (old_Heure == 23 && Int_Heure == 0) {
       erreurTriac = false;

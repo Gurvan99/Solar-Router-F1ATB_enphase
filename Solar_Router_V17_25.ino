@@ -359,10 +359,6 @@
     Variante esp32dev-light : retrait des options, réglages et scripts liés aux sources non
     compilées (Enphase Envoy, Linky, UxIx3, Shelly EM et Shelly Pro EM) des pages Paramètres
     et Données brutes.
-
-
-
-
   Les détails sont disponibles sur / Details are available here:
   https://f1atb.fr  Section Domotique / Home Automation
 
@@ -1082,6 +1078,12 @@ void setup() {
   Serial.println();
   StockMessage("Booting Routeur F1ATB");
   Serial.println(Version);
+
+  //Reset Reason
+  Serial.println("\n--- ANALSE DU DERNIER BOOT ---");
+  print_reset_reason();
+  Serial.println("--------------------------------\n");
+
   //Watchdog initialisation
   esp_task_wdt_deinit();
   // Initialisation de la structure de configuration pour la WDT
@@ -1573,6 +1575,7 @@ void loop() {
 
   //Estimation charge coeur
   unsigned long tps = millis();
+  GestionCumulsOuverture(tps);
   float deltaT = float(tps - previousLoop);
   previousLoop = tps;
   previousLoopMin = min(previousLoopMin, deltaT);
@@ -1639,7 +1642,7 @@ void loop() {
 
     if (tps - previousTimer2sMillis > 2000) {
       unsigned long dt = tps - previousTimer2sMillis;
-      previousTimer2sMillis += 2000;  //Pour caler exactement à 2s
+      previousTimer2sMillis = tps;
       tabPw_Maison_2s[IdxStock2s] = PuissanceS_M - PuissanceI_M;
       tabPw_Triac_2s[IdxStock2s] = PuissanceS_T - PuissanceI_T;
       tabPva_Maison_2s[IdxStock2s] = PVAS_M - PVAI_M;
@@ -1941,4 +1944,61 @@ void H_Ouvre_Equivalent(unsigned long dt) {
       }
     }
   }
+}
+
+void print_reset_reason()
+{
+    esp_reset_reason_t reason = esp_reset_reason();
+    String S="";
+    switch (reason) {
+        case ESP_RST_UNKNOWN:
+            S="Cause inconnue";
+            break;
+        case ESP_RST_POWERON:
+            S="Power ON";
+            break;
+        case ESP_RST_EXT:
+            S="Reset pin externe";
+            break;
+        case ESP_RST_SW:
+            S="Software reset";
+            break;
+        case ESP_RST_PANIC:
+            S="Panic / crash";
+            break;
+        case ESP_RST_INT_WDT:
+            S="Interrupt Watchdog";
+            break;
+        case ESP_RST_TASK_WDT:
+            S="Task Watchdog";
+            break;
+        case ESP_RST_WDT:
+            S="Watchdog";
+            break;
+        case ESP_RST_DEEPSLEEP:
+            S="Deep Sleep";
+            break;
+        case ESP_RST_BROWNOUT:
+            S="Brownout";
+            break;
+        case ESP_RST_SDIO:
+            S="Reset SDIO";
+            break;
+        case ESP_RST_USB:
+            S="Reset USB";
+            break;
+        case ESP_RST_JTAG:
+            S="Reset JTAG";
+            break;
+        case ESP_RST_EFUSE:
+            S="Erreur efuse";
+            break;
+        case ESP_RST_PWR_GLITCH:
+            S="Power glitch";
+            break;
+        default:
+            S="Autre cause (" + String(reason) + ")";
+            break;
+    }
+    StockMessage("Dernier reset " +S);
 }
