@@ -412,6 +412,7 @@
 #include "PageActions.h"
 #include "JS_Actions.h"
 #include "PagePara.h"
+#include "PagePureControl.h"
 #include "JS_Para.h"
 #include "PageBrute.h"
 #include "JS_Brute.h"
@@ -482,6 +483,10 @@ unsigned int MQTTRepet = 0;
 unsigned long MQTTIP = 0;
 unsigned int MQTTPort = 1883;
 String MQTTHost = "";  // Nom d'hôte du broker MQTT (ex. broker cloud) - prioritaire sur MQTTIP si renseigné
+String PureControlApiToken = "";
+unsigned int PureControlPeriodeMinutes = 1;
+int PureControlCanal[4] = { 0, 1, -1, -1 };
+String PureControlId[4] = { "", "", "", "" };
 byte MQTTTLS = 0;      // Connexion MQTT chiffrée TLS (obligatoire pour la plupart des brokers cloud, port 8883)
 String MQTTUser = "User";
 String MQTTPwd = "password";
@@ -1731,6 +1736,7 @@ void loop() {
     previousMQTTMillis = tps;
     GestionMQTT();
   }
+  GestionPureControl(tps);
   if (tps - previousLEDsMillis >= 50) {
     previousLEDsMillis = tps;
     Gestion_LEDs();

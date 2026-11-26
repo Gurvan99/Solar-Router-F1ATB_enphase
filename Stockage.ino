@@ -265,11 +265,21 @@ void StockMessage(String m) {
 // *************************************************************
 // Stockage parametres en zone SPIFFS (methode 2026 depuis V17)
 // *************************************************************
-void RecordFichierParametres() {
+bool RecordFichierParametres() {
+  String contenu = SerializeConfiguration();
   File file = LittleFS.open("/parametres.json", FILE_WRITE);
-  file.print(SerializeConfiguration());  //Fichier au format JSON
+  if (!file) {
+    Serial.println("Erreur d'ouverture du fichier paramètres en écriture");
+    return false;
+  }
+  size_t ecrits = file.print(contenu);  //Fichier au format JSON
   file.close();
+  if (ecrits != contenu.length()) {
+    Serial.println("Erreur d'écriture du fichier paramètres");
+    return false;
+  }
   Serial.println("Ecriture fichier parametres");
+  return true;
 }
 void ReadFichierParametres() {
   if (!LittleFS.exists("/parametres.json")) {  //Fichier pas encore crée
@@ -436,8 +446,7 @@ void ImportParametres(String Conf) {
 void DeserializeConfiguration(String json) {
 
   int16_t Hdeb;
-  Serial.print("Json reçu:");
-  Serial.println(json);
+  Serial.println("Configuration reçue");
   JsonDocument conf;
   DeserializationError error = deserializeJson(conf, json);
 
@@ -494,6 +503,14 @@ void DeserializeConfiguration(String json) {
   EnphaseUser = conf["EnphaseUser"].as<String>();
   EnphasePwd = conf["EnphasePwd"].as<String>();
   EnphaseSerial = conf["EnphaseSerial"].as<String>();
+  PureControlApiToken = conf["PureControlApiToken"] | PureControlApiToken;
+  PureControlPeriodeMinutes = conf["PureControlPeriodeMinutes"] | PureControlPeriodeMinutes;
+  for (int i = 0; i < 4; i++) {
+    PureControlCanal[i] = conf["PureControlCanal" + String(i)].isNull()
+                              ? PureControlCanal[i]
+                              : conf["PureControlCanal" + String(i)].as<int>();
+    PureControlId[i] = conf["PureControlId" + String(i)] | PureControlId[i];
+  }
   MQTTRepet = conf["MQTTRepet"];
   MQTTIP = conf["MQTTIP"];
   MQTTHost = conf["MQTTHost"].as<String>();
@@ -639,6 +656,12 @@ String SerializeConfiguration() {
   conf["EnphaseUser"] = EnphaseUser;
   conf["EnphasePwd"] = EnphasePwd;
   conf["EnphaseSerial"] = EnphaseSerial;
+  conf["PureControlApiToken"] = PureControlApiToken;
+  conf["PureControlPeriodeMinutes"] = PureControlPeriodeMinutes;
+  for (int i = 0; i < 4; i++) {
+    conf["PureControlCanal" + String(i)] = PureControlCanal[i];
+    conf["PureControlId" + String(i)] = PureControlId[i];
+  }
   if (ModePara == 0) {
     MQTTRepet = 0;
     subMQTT = 0;

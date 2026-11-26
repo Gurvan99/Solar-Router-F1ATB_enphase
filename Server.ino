@@ -13,6 +13,9 @@ void Init_Server() {
   server.on("/MainJS2", handleMainJS2);
   server.on("/MainJS3", handleMainJS3);
   server.on("/Para", handlePara);
+  server.on("/PureControl", handlePureControl);
+  server.on("/PureControlConfig", HTTP_GET, handlePureControlConfig);
+  server.on("/PureControlConfig", HTTP_POST, handlePureControlSave);
   server.on("/ParaJS1", handleParaJS1);
   server.on("/ParaJS2", handleParaJS2);
   server.on("/ParaCommunJS", handleParaCommunJS);
@@ -743,6 +746,140 @@ void handlePara() {
   Serial.println("  Attendue :" + CleAccesRef);
   previousTempMillis = millis() - 120000;
 }
+void handlePureControl() {
+  lectureCookie(PureControlHtml);
+}
+bool AuthentifierConfiguration() {
+  ExtraitCookie();
+  if (CleAcces != CleAccesRef) {
+    server.send(403, "text/plain", "Accès refusé");
+    return false;
+  }
+  return true;
+}
+void handlePureControlConfig() {
+  if (!AuthentifierConfiguration()) return;
+
+  JsonDocument document;
+  document["apiToken"] = PureControlApiToken;
+  document["periodeMinutes"] = PureControlPeriodeMinutes;
+  JsonArray nomsCanaux = document["nomsCanaux"].to<JsonArray>();
+  JsonArray elements = document["elements"].to<JsonArray>();
+  for (int i = 0; i < 4; i++) {
+    nomsCanaux.add(nomTemperature[i]);
+    JsonObject element = elements.add<JsonObject>();
+    element["canal"] = PureControlCanal[i];
+    element["id"] = PureControlId[i];
+  }
+  String reponse;
+  serializeJson(document, reponse);
+  server.sendHeader("Cache-Control", "no-store");
+  server.send(200, "application/json", reponse);
+}
+
+void handlePureControlSave() {
+  if (!AuthentifierConfiguration()) return;
+
+  JsonDocument document;
+  DeserializationError erreur = deserializeJson(document, server.arg("plain"));
+  if (erreur) {
+    server.send(400, "text/plain", "Configuration JSON invalide");
+    return;
+  }
+
+  if (!document["apiToken"].is<const char *>()) {
+    server.send(400, "text/plain", "Token API invalide.");
+    return;
+  }
+  String token = document["apiToken"].as<String>();
+  if (token.length() != 0 && token.length() != 32) {
+    server.send(400, "text/plain", "Le token API doit contenir exactement 32 caractères.");
+    return;
+  }
+  for (size_t i = 0; i < token.length(); i++) {
+    if (token[i] < 0x21 || token[i] > 0x7e) {
+      server.send(400, "text/plain", "Le token API ne doit pas contenir d'espace ni de caractère de contrôle.");
+      return;
+    }
+  }
+  if (!document["periodeMinutes"].is<int>()) {
+    server.send(400, "text/plain", "Période d'envoi invalide");
+    return;
+  }
+  int periodeRecue = document["periodeMinutes"].as<int>();
+  if (periodeRecue < 0 || periodeRecue > 1440) {
+    server.send(400, "text/plain", "La période doit être comprise entre 0 et 1440 minutes.");
+    return;
+  }
+  unsigned int periode = static_cast<unsigned int>(periodeRecue);
+
+  JsonArrayConst elements = document["elements"].as<JsonArrayConst>();
+  if (elements.isNull() || elements.size() != 4) {
+    server.send(400, "text/plain", "Quatre éléments de configuration sont requis.");
+    return;
+  }
+
+  int canaux[4];
+  String identifiants[4];
+  for (int i = 0; i < 4; i++) {
+    JsonObjectConst element = elements[i];
+    if (!element["canal"].is<int>() || !element["id"].is<const char *>()) {
+      server.send(400, "text/plain", "Canal ou ID invalide.");
+      return;
+    }
+    canaux[i] = element["canal"].as<int>();
+    identifiants[i] = element["id"].as<String>();
+    if (canaux[i] < -1 || canaux[i] > 3 || identifiants[i].length() > 10) {
+      server.send(400, "text/plain", "Canal ou ID hors limites.");
+      return;
+    }
+    if (identifiants[i].length() > 0) {
+      bool chiffres = true;
+      for (size_t j = 0; j < identifiants[i].length(); j++) {
+        if (identifiants[i][j] < '0' || identifiants[i][j] > '9') chiffres = false;
+      }
+      bool nonNul = false;
+      for (size_t j = 0; j < identifiants[i].length(); j++) {
+        if (identifiants[i][j] != '0') nonNul = true;
+      }
+      if (!chiffres || !nonNul || canaux[i] < 0) {
+        server.send(400, "text/plain", "Un ID doit être numérique et associé à un canal.");
+        return;
+      }
+      for (int precedent = 0; precedent < i; precedent++) {
+        if (identifiants[precedent] == identifiants[i]) {
+          server.send(400, "text/plain", "Chaque ID PureControl doit être unique.");
+          return;
+        }
+      }
+    }
+  }
+
+  String ancienToken = PureControlApiToken;
+  unsigned int anciennePeriode = PureControlPeriodeMinutes;
+  int anciensCanaux[4];
+  String anciensIdentifiants[4];
+  for (int i = 0; i < 4; i++) {
+    anciensCanaux[i] = PureControlCanal[i];
+    anciensIdentifiants[i] = PureControlId[i];
+    PureControlCanal[i] = canaux[i];
+    PureControlId[i] = identifiants[i];
+  }
+  PureControlApiToken = token;
+  PureControlPeriodeMinutes = periode;
+
+  if (!RecordFichierParametres()) {
+    PureControlApiToken = ancienToken;
+    PureControlPeriodeMinutes = anciennePeriode;
+    for (int i = 0; i < 4; i++) {
+      PureControlCanal[i] = anciensCanaux[i];
+      PureControlId[i] = anciensIdentifiants[i];
+    }
+    server.send(500, "text/plain", "Impossible d'enregistrer la configuration.");
+    return;
+  }
+  server.send(200, "application/json", "{\"saved\":true}");
+}
 void handleParaNew() {
   String EtatGpioInitial = String(Fpwm);
   for (int i = 1; i < NbActions; i++) {
@@ -803,7 +940,13 @@ void handleParaCommunJS() {
   SendGzipJS(ParaCommunJS_gz, ParaCommunJS_gz_len);
 }
 void handleParaFixe() {  //Paramètres stockés en fichier
+  if (!AuthentifierConfiguration()) return;
   File file = LittleFS.open("/parametres.json", "r");
+  if (!file) {
+    server.send(500, "text/plain", "Impossible de lire la configuration.");
+    return;
+  }
+  server.sendHeader("Cache-Control", "no-store");
   server.send(200, "application/json", file.readString());
   file.close();
 }

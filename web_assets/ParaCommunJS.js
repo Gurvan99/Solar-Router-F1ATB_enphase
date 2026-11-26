@@ -69,7 +69,7 @@
   function SetHautBas(){
       let S="<div class='onglets'><div class='Bonglet Baccueil'><a href='/'>Accueil</a></div><div class='Bonglet Bbrut'><a href='/Brute'>Donn&eacute;es brutes</a></div><div class='Bonglet Bparametres'><a href='/Para'>Param&egrave;tres</a></div><div class='Bonglet Bactions'><a href='/Actions'>Actions</a></div></div>";
       S +="<div id='onglets2'><div class='Bonglet2 Bgeneraux'><a href='/Para'>Généraux</a></div><div class='Bonglet2 Bheure' ><a href='/Heure'>Heure</a></div><div class='Bonglet2 Bexport'><a href='/Export'>Import / Export</a></div><div class='Bonglet2 Bota'><a href='/OTA'>Mise à jour par OTA</a></div>";
-      S +="<div id='Bwifi' class='Bonglet2 Bwifi'><a href='/Wifi'>WIFI</a></div><div class='Bonglet2 Bcouleurs'><a href='/Couleurs'>Couleurs</a></div></div>";
+      S +="<div id='Bwifi' class='Bonglet2 Bwifi'><a href='/Wifi'>WIFI</a></div><div class='Bonglet2 Bcouleurs'><a href='/Couleurs'>Couleurs</a></div><div class='Bonglet2'><a href='/PureControl'>PureControl</a></div></div>";
       S +="<h2 id='nom_R'>Routeur Solaire - RMS</h2>";
       GH("lesOnglets",S);
       GH("pied","<div>Routeur Version : <span id='version'></span></div><div><a href='https:F1ATB.fr/fr' target='_blank' >F1ATB.fr</a></div>");
@@ -112,4 +112,3 @@ function LaVal(d) {
   // retourne format xx xxx xxx  (3 groupes)
   return `${s.substr(-9, 3)} ${s.substr(-6, 3)} ${s.substr(-3, 3)}`;
 }
-
