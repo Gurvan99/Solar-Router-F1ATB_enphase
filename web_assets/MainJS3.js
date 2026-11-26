@@ -56,7 +56,13 @@ async function EtatActions(Force, NumAction) {
                 // data est à partir de message[i + 4]
                 const data = message[i + 4].split(RS); 
                 
-                if (data.length < 8) continue; // Sauter les lignes mal formatées
+                if (data.length < 9) continue; // Sauter les lignes mal formatées
+
+                const ouverture = data[2] === "On" ? 100 : data[2] === "Off" ? 0 : parseFloat(data[2]);
+                const puissanceNominale = parseFloat(data[8]);
+                const puissanceEstimee = puissanceNominale > 0 && Number.isFinite(ouverture)
+                    ? `${Math.round(puissanceNominale * ouverture / 100)} W`
+                    : "—";
 
                 // Stockage du forçage actuel
                 ActionForce[i] = data[3];
@@ -68,7 +74,7 @@ async function EtatActions(Force, NumAction) {
 
                 // Logique d'ouverture (On/Off vs Pourcentage)
                 if (data[2] === "On" || data[2] === "Off") { 
-                    S_html += `<div class='item_val ce'>${data[2]}</div>`;
+                    S_html += `<div class='item_val ce'>${data[2]} - ${puissanceEstimee}</div>`;
                     // LIGHT_EXCLUDE_BEGIN
                     if (data[2] === "On") ouvre = 100;
                     // LIGHT_EXCLUDE_END
@@ -80,7 +86,7 @@ async function EtatActions(Force, NumAction) {
                     S_html += `<div class='item_val ce'>
                         <div class='jaugeBack item_val'>
                             <div class='jauge' style='width:${W}px'></div>
-                            <div class='ce w100'>${data[2]}%</div>
+                            <div class='ce w100' title='Puissance estimée'>${data[2]}% - ${puissanceEstimee}</div>
                         </div>
                     </div>`;
                     // LIGHT_EXCLUDE_BEGIN

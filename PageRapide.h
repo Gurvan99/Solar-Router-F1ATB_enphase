@@ -86,10 +86,17 @@ const char *PageRapide = R"====(
       for (const action of actions) {
         const ligne = document.createElement("tr");
         ajouterCellule(ligne, action.nom);
-        ajouterCellule(
-          ligne,
-          action.etat === "Ouverture" ? `${action.ouverture} %` : action.etat
-        );
+        const etat = document.createElement("td");
+        const etatOuverture = document.createElement("div");
+        etatOuverture.title = "Puissance estimée";
+        const puissanceEstimee = action.puissanceEstimee == null
+          ? "—"
+          : `${Number(action.puissanceEstimee).toLocaleString("fr-FR")} W`;
+        etatOuverture.textContent = action.etat === "Ouverture"
+          ? `${action.ouverture} % - ${puissanceEstimee}`
+          : `${action.etat} - ${puissanceEstimee}`;
+        etat.appendChild(etatOuverture);
+        ligne.appendChild(etat);
 
         const equivalent = document.createElement("td");
         equivalent.className = "equivalent";

@@ -230,9 +230,16 @@ void handleAjaxRapide() {
     action["etat"] = commandeOnOff
         ? (LesActions[i].On ? "On" : "Off")
         : "Ouverture";
-    action["ouverture"] = commandeOnOff
+    const int ouverture = commandeOnOff
         ? (LesActions[i].On ? 100 : 0)
         : 100 - Retard[i];
+    action["ouverture"] = ouverture;
+    if (LesActions[i].PuissanceNominale > 0) {
+      action["puissanceEstimee"] = static_cast<unsigned long>(
+          LesActions[i].PuissanceNominale * (ouverture / 100.0f) + 0.5f);
+    } else {
+      action["puissanceEstimee"] = nullptr;
+    }
     action["forcage"] = LesActions[i].tOnOff;
     action["routageHeures"] = int(LesActions[i].H_OuvreRoutage * 100.0);
     action["routageWh"] = static_cast<unsigned long>(
@@ -607,6 +614,7 @@ void handleAjax_etatActions() {
       S += String(static_cast<unsigned long>(LesActions[i].PuissanceNominale * LesActions[i].H_OuvreRoutage + 0.5f)) + RS;
       S += String(int(LesActions[i].H_OuvreForce * 100.0)) + RS;
       S += String(static_cast<unsigned long>(LesActions[i].PuissanceNominale * LesActions[i].H_OuvreForce + 0.5f)) + RS;
+      S += String(LesActions[i].PuissanceNominale) + RS;
       S += GS;
       NbActifs++;
     }

@@ -185,6 +185,7 @@ py -3.13 -m platformio device monitor
 
 ## Historique des versions
 
+- **Pages Accueil et Rapide (version firmware inchangée)** : affichage de la puissance instantanée estimée par action, calculée depuis sa puissance nominale et son ouverture; un tiret indique qu'aucune puissance nominale n'est configurée.
 - **Correctifs (19/11/2026, version firmware inchangée)** : remise à zéro à 23 h 30 et sauvegarde périodique des cumuls d'ouverture équivalente; restauration uniquement pour la journée opérationnelle correspondante (de 23 h 30 à 23 h 30); correction du surcomptage de cette durée lorsque la boucle prend du retard.
 - **Build light (version firmware inchangée)** : exclusion des historiques et graphes 10 min/48 h de l'interface Web et de l'écran LCD, tout en conservant l'historique annuel et les traitements énergie.
 - **PureControl (version firmware inchangée)** : page de configuration dédiée pour le token API, la période d'envoi en minutes et jusqu'à quatre correspondances entre canaux de température et IDs; envoi HTTPS périodique des mesures valides configurées vers l'API Time Series. Le mode réseau « Internet » est requis.
