@@ -2,6 +2,7 @@
 // Fonction de fin de chargement des paramètres fixes
 function SetParaFixe() {
   GH("nomSondeMobile",F.nomSondeMobile);
+  // LIGHT_EXCLUDE_BEGIN
   Graphes_Nom[0]=F.nomSondeMobile +" / 10 mn";
   Graphes_Nom[2]=F.nomSondeMobile +" / 48 h";
   if (biSonde){
@@ -20,6 +21,7 @@ function SetParaFixe() {
   Graphes_Nom[6]=F.nomTemperature2;
   Graphes_Nom[7]=F.nomTemperature3;
   GID("B_graph").style.display = "flex";
+  // LIGHT_EXCLUDE_END
   GID("date").style.display = "block";
   GID("foot").style.display = "block";
   GID("routeur").style.display = "none";
@@ -28,10 +30,17 @@ function SetParaFixe() {
 // Fonction de fin de chargement des paramètres variables
 function SetParaVar() {  
   Set_Couleurs();
+  // LIGHT_EXCLUDE_BEGIN
   setInterval(Refresh_2s, 2000); 
+  // LIGHT_EXCLUDE_END
   GID("TabMesures").style.display = "block";
   LoadData();
+  // LIGHT_EXCLUDE_BEGIN
   LoadHisto10mn();
+  // LIGHT_EXCLUDE_END
+  // LIGHT_ONLY_BEGIN
+  LoadHisto1an();
+  // LIGHT_ONLY_END
   EtatActions(0, 0);
   let S = "";
   for (let c = 1; c < V.IP_RMS.length; c++) { 
@@ -89,6 +98,7 @@ function autreRaffiche(c) {
 
 // Fonction de tracé de graphique SVG
 var cadrageMax;
+// LIGHT_EXCLUDE_BEGIN
 function Plot(SVG, Tab, couleur1, titre1, couleur2, titre2) {
   let Vmax = 0;
   const TabY0 = [];
@@ -206,6 +216,7 @@ function Plot(SVG, Tab, couleur1, titre1, couleur2, titre2) {
   TabVal["S_" + SVG] = [TabY0, TabY1];
   TabCoul["S_" + SVG] = [couleur1, couleur2];
 }
+// LIGHT_EXCLUDE_END
 
 function PlotWhJour(tabWh){
   if (tabWh.length>0){
@@ -350,6 +361,7 @@ function stopAffiche() {
 }
 
 // Fonction de tracé des ouvertures
+// LIGHT_EXCLUDE_BEGIN
 function Plot_ouvertures(Gr) {
   GID("SVG_Ouvertures").style.display = "block";
   const d = new Date();
@@ -496,6 +508,7 @@ function Plot_ouvertures_2s() {
   TabCoul["S_Ouvertures_2s"] = LesCouls;
   GID("SVG_Ouvertures_2s").innerHTML = S;
 }
+// LIGHT_EXCLUDE_END
 
 
 

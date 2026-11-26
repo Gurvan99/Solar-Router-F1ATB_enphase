@@ -1,3 +1,4 @@
+#ifndef ROUTEUR_BUILD_LIGHT
 // ******************************
 // * Client d'un HomeWizard     *
 // * ESSAI A VALIDER            *
@@ -64,3 +65,4 @@ void LectureHomeW() {
     cptLEDyellow = 4;
   }
 }
+#endif

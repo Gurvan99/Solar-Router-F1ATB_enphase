@@ -132,13 +132,20 @@ Une variante allégée est disponible en complément, sans modifier la cible com
 pio run -e esp32dev-light
 pio run -e esp32dev-light -t upload
 ```
-Elle conserve Zendure 3CT, UxI, UxIx2, SmartGateways, HomeWizard, MQTT et ESP externe ; elle
-retire Enphase-Envoy, Linky, UxIx3 et Shelly EM/Pro de la compilation et du choix des sources.
-Les pages Paramètres et Données brutes de cette variante omettent également les réglages,
-panneaux et scripts propres à ces sources exclues.
-Cette option vise surtout à réduire la taille du firmware et peut accélérer légèrement les
-compilations complètes. Elle ne devrait pas améliorer la vitesse d'exécution ni réduire notablement
-la RAM lorsque Zendure est utilisé.
+Elle conserve uniquement Zendure 3CT comme source de mesure (avec « Non définie » comme solution
+de repli). Les routines des sources de mesure inutilisées et leurs principaux tampons sont exclus ;
+le sélecteur ne propose que Zendure et « Non définie ». Si une configuration sauvegardée choisit
+une autre source, le démarrage la remplace par « Non définie » et l'indique dans le journal.
+Le profil complet `esp32dev` reste inchangé.
+
+Cette variante vise aussi à réduire la RAM statique occupée par les tampons et états des sources
+inutilisées. Le gain de mémoire libre réel dépend toutefois de la configuration et doit être vérifié
+sur l'ESP32 ; la taille RAM affichée par le build ne garantit pas une hausse équivalente du heap
+disponible à l'exécution.
+
+Le build light définit aussi `ROUTEUR_NO_HISTOGRAMMES` : il retire les historiques et graphes Web/LCD
+sur 10 min et 48 h, mais conserve l'historique annuel et les calculs d'énergie. Le build complet
+`esp32dev` conserve les graphes.
 
 **⚠️ Si plusieurs versions de Python sont installées sur le PC** (ex. un ancien Python 3.8 à côté
 d'un Python ≥3.10) : la commande `pio` du PATH peut être un raccourci généré par la mauvaise
@@ -179,3 +186,4 @@ py -3.13 -m platformio device monitor
 ## Historique des versions
 
 - **Correctifs (19/11/2026, version firmware inchangée)** : remise à zéro à 23 h 30 et sauvegarde périodique des cumuls d'ouverture équivalente; restauration uniquement pour la journée opérationnelle correspondante (de 23 h 30 à 23 h 30); correction du surcomptage de cette durée lorsque la boucle prend du retard.
+- **Build light (version firmware inchangée)** : exclusion des historiques et graphes 10 min/48 h de l'interface Web et de l'écran LCD, tout en conservant l'historique annuel et les traitements énergie.

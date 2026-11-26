@@ -1,3 +1,4 @@
+#ifndef ROUTEUR_BUILD_LIGHT
 //***********************************
 //* Source EnPhase V7   			*
 //***********************************
@@ -595,7 +596,9 @@ void LectureEnphase()
   if (PactReseau != 0 || PvaReseau != 0) PuissanceRecue = true;  // Reset du Watchdog à chaque trame reçue de la passerelle Envoy-S metered
   if (cptLEDyellow > 30) cptLEDyellow = 4;
 }
+#endif
 
+// Fonctions JSON partagées notamment avec Zendure et MQTT.
 String PrefiltreJson(String F1, String F2, String Json) {
   int p = Json.indexOf(F1);
   Json = Json.substring(p);

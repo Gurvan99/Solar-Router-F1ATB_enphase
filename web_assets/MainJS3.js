@@ -60,14 +60,18 @@ async function EtatActions(Force, NumAction) {
 
                 // Stockage du forçage actuel
                 ActionForce[i] = data[3];
+                // LIGHT_EXCLUDE_BEGIN
                 let ouvre = 0;
+                // LIGHT_EXCLUDE_END
                 
                 S_html += `<div class='item_val ce'>${data[1]}</div>`; // Nom de l'action
 
                 // Logique d'ouverture (On/Off vs Pourcentage)
                 if (data[2] === "On" || data[2] === "Off") { 
                     S_html += `<div class='item_val ce'>${data[2]}</div>`;
+                    // LIGHT_EXCLUDE_BEGIN
                     if (data[2] === "On") ouvre = 100;
+                    // LIGHT_EXCLUDE_END
                 } else {
                     // Calcul de la jauge pour l'ouverture en pourcentage
                     const pourcentage = parseFloat(data[2]);
@@ -79,11 +83,15 @@ async function EtatActions(Force, NumAction) {
                             <div class='ce w100'>${data[2]}%</div>
                         </div>
                     </div>`;
+                    // LIGHT_EXCLUDE_BEGIN
                     ouvre = parseInt(data[2], 10);
+                    // LIGHT_EXCLUDE_END
                 }
                 
+                // LIGHT_EXCLUDE_BEGIN
                 // Stockage de l'ouverture (LastActOuvre doit être un tableau global)
                 LastActOuvre[parseInt(data[0], 10)] = ouvre; 
+                // LIGHT_EXCLUDE_END
                 S_html += `<div class='ce item_val'>
                     <div>Routage : ${Hdeci2Hmn(data[4])} · ${data[5]} Wh</div>
                     <div>Forcé : ${Hdeci2Hmn(data[6])} · ${data[7]} Wh</div>
@@ -125,6 +133,7 @@ async function EtatActions(Force, NumAction) {
 }
 
 // Fonction de rafraîchissement 2 secondes
+// LIGHT_EXCLUDE_BEGIN
 function Refresh_2s() {
   if (tabPW2sM.length > 0) {
     tabPW2sM.shift(); 
@@ -157,6 +166,7 @@ function Refresh_2s() {
     if (tabActOuvre.length > 0 && Graphes_Select[8]) Plot_ouvertures_2s();
   }
 }
+// LIGHT_EXCLUDE_END
 
 
 
@@ -201,27 +211,39 @@ function AdaptationSource() {
 
 
 // Fonction d'initialisation
+// LIGHT_EXCLUDE_BEGIN
+const INDEX_GRAPHE_ANNUEL = 10;
 var Graphes_Nom=["Pw / 10 mn","Pw T","Pw / 48h","Pw 48h T","Temperature 0","Temperature 1","Temperature 2","Temperature 3","Ouvertures / 10mn","Ouvertures / 48h","Wh Jour"];
 var Graphes_Dispo=[true,true,true,true,true,true,true,true,true,true,true]; //Il y a des données
 var Graphes_Select=[true,true,true,true,true,true,true,true,true,true,true]; //Affichage choisi par la personne
 var Graphes_Ordre=[0,1,2,3,4,5,6,7,8,9,10]; //11 graphiques différents
+// LIGHT_EXCLUDE_END
+// LIGHT_ONLY_BEGIN
+const INDEX_GRAPHE_ANNUEL = 0;
+var Graphes_Select=[true];
+// LIGHT_ONLY_END
 function Init() {
   SetHautBas();
   
+  // LIGHT_EXCLUDE_BEGIN
   let VA_M = "true";
   let VA_T = "true";
+  // LIGHT_EXCLUDE_END
   
   for (let i = 0; i < 8; i++) { 
     DispAutres[i] = "false"; // Initialiser avec 'false' string pour correspondre à localStorage
   }
   if (localStorage.getItem("DispAutres") !== null) DispAutres= JSON.parse(localStorage.getItem("DispAutres"));
   
+  // LIGHT_EXCLUDE_BEGIN
   if (localStorage.getItem("SVG_PW2sM_LS") !== null) { 
     VA_M = localStorage.getItem("SVG_PW2sM_LS");
     VA_T = localStorage.getItem("SVG_PW2sT_LS"); 
   }
+  // LIGHT_EXCLUDE_END
   
   
+  // LIGHT_EXCLUDE_BEGIN
   let Graphes=[
             `<p id="SVG_PW2sM"></p>
             <div class="choixG">
@@ -270,6 +292,10 @@ function Init() {
   GH("LesGraphes",G);
   Graphes_Dispo[1]=biSonde;
   Graphes_Dispo[3]=biSonde;
+  // LIGHT_EXCLUDE_END
+  // LIGHT_ONLY_BEGIN
+  GH("LesGraphes", "<p id='SVG_WhJour'></p>");
+  // LIGHT_ONLY_END
   
   let S = ''; 
   if (biSonde) {
@@ -360,12 +386,14 @@ function Init() {
   LoadParaFixe();
   
 
+  // LIGHT_EXCLUDE_BEGIN
   GID("SVG_PW2sM_C").checked = (VA_M === "true") ? true : false;
   GID("SVG_PW2sT_C").checked = (VA_T === "true") ? true : false;
-  
+  // LIGHT_EXCLUDE_END
   
 }
 
+// LIGHT_EXCLUDE_BEGIN
 function ListeGraph(){
   let Gnom=`<div>Choix des graphiques</div><div id="B_Graph_in">`;
   for (let i=0;i<Graphes_Ordre.length;i++){
@@ -410,3 +438,4 @@ function Gr_Select(){
   }
   localStorage.setItem("TableauGraphiquesSelected",JSON.stringify(Graphes_Select));
 }
+// LIGHT_EXCLUDE_END

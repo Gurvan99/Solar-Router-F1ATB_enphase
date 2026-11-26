@@ -364,30 +364,30 @@ R"====(</span></label>
           <select id="sources" onclick="checkDisabled();"
                   title="Suivant l'interface de mesure choisie.">
             <option value="NotDef" selected>Non définie</option>
-            <option value="UxI">UxI</option>
-            <option value="UxIx2">UxIx2</option>
 )===="
 #ifndef ROUTEUR_BUILD_LIGHT
 R"====(
+            <option value="UxI">UxI</option>
+            <option value="UxIx2">UxIx2</option>
             <option value="UxIx3">UxIx3</option>
             <option value="Linky">Linky</option>
             <option value="Enphase">Enphase-Envoy</option>
-)===="
-#endif
-R"====(
             <option value="SmartG">SmartGateways</option>
             <option value="HomeW">HomeWizard</option>
-)===="
-#ifndef ROUTEUR_BUILD_LIGHT
-R"====(
             <option value="ShellyEm">Shelly Em</option>
             <option value="ShellyPro">Shelly Pro Em</option>
 )===="
 #endif
 R"====(
             <option value="Zendure">Zendure 3CT</option>
+)===="
+#ifndef ROUTEUR_BUILD_LIGHT
+R"====(
             <option value="Ext">ESP Externe</option>
             <option value="Pmqtt">MQTT</option>
+)===="
+#endif
+R"====(
           </select>
         </div>
 

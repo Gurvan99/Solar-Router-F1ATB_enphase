@@ -2,6 +2,7 @@
 // ******************************************************
 // * Informations de puissance reçue via un Broker MQTT *
 // ******************************************************
+#ifndef ROUTEUR_BUILD_LIGHT
 void UpdatePmqtt() {
   float Pw = PfloatMax(PwMQTT);
   float Pf = 1;
@@ -52,3 +53,4 @@ void UpdatePmqtt() {
     cptLEDyellow = 4;
   }
 }
+#endif

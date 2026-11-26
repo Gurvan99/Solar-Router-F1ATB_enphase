@@ -176,7 +176,11 @@ const char *MainHtml = R"====(
       left: 4px;
     }
 
-    #TabMesures,
+    #TabMesures
+)===="
+#ifndef ROUTEUR_NO_HISTOGRAMMES
+R"====(
+    ,
     #SVG_PW48hT,
     #SVG_PW2sT,
     .SVG_Temp48h,
@@ -184,6 +188,15 @@ const char *MainHtml = R"====(
     #SVG_Ouvertures_2s {
       display: none;
     }
+)===="
+#else
+R"====(
+    {
+      display: none;
+    }
+)===="
+#endif
+R"====(
 
     #donneeDistante {
       font-size: 50%;
@@ -217,6 +230,9 @@ const char *MainHtml = R"====(
       display: none;
     }
 
+    )===="
+#ifndef ROUTEUR_NO_HISTOGRAMMES
+R"====(
     .choixG {
       text-align: left;
       width: 100%;
@@ -231,6 +247,9 @@ const char *MainHtml = R"====(
       font-size: 16px;
       display: none;
     }
+)===="
+#endif
+R"====(
 
     iframe {
       width: 100%;
@@ -251,6 +270,9 @@ const char *MainHtml = R"====(
     .autreRif {
       width: 100%;
     }
+    )===="
+#ifndef ROUTEUR_NO_HISTOGRAMMES
+R"====(
     #B_graph{ 
       display:none;
       justify-content:space-between;
@@ -273,6 +295,9 @@ const char *MainHtml = R"====(
       grid-template-columns: auto auto auto auto;
       
     }
+)===="
+#endif
+R"====(
     #date{
       display:none;
     }
@@ -293,7 +318,13 @@ const char *MainHtml = R"====(
 
   <div id="etatActions" class="grid-container2"></div>
 
+)===="
+#ifndef ROUTEUR_NO_HISTOGRAMMES
+R"====(
   <div id="B_graph"><div>&nbsp;</div><div>Graphiques</div><div style="cursor:pointer;"><span onclick="ListeGraph();">📈</span><div id="B_Graph"></div></div></div>
+)===="
+#endif
+R"====(
   <div id="LesGraphes"></div>
 
   <div id="info">

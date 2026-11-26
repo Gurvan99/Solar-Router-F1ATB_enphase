@@ -1,3 +1,4 @@
+#ifndef ROUTEUR_BUILD_LIGHT
 // *************************************************
 // * Client lecture JSY-MK-333 * Triphasé *
 // * Développement initial de Pierre F (Mars 2024) *
@@ -204,3 +205,4 @@ void Lecture_JSY333() {
     StockMessage("Trame de données JSY incomplète : " + String(a));
   }
 }
+#endif

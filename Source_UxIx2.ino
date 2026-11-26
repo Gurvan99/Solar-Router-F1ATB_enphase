@@ -1,3 +1,4 @@
+#ifndef ROUTEUR_BUILD_LIGHT
 // *******************************
 // * Source de Mesures UI Double *
 // *      Capteur JSY-MK-194     *
@@ -106,3 +107,4 @@ void LectureUxIx2() {  //Ecriture et Lecture port série du JSY-MK-194  .
     }
   }
 }
+#endif

@@ -1,3 +1,4 @@
+#ifndef ROUTEUR_BUILD_LIGHT
 //*********************************************************************
 // Variante Shelly Pro Em proposé par Raphael591 (Juillet 2024)       *
 //  + Correction Octobre 2024  et Janvier 2025                        *
@@ -345,3 +346,4 @@ void LectureShellyProEm() {
     cptLEDyellow = 4;
   }
 }
+#endif

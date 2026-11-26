@@ -31,12 +31,16 @@ void Init_Server() {
   server.on("/Brute", handleBrute);
   server.on("/BruteJS1", handleBruteJS1);
   server.on("/BruteJS2", handleBruteJS2);
+#ifndef ROUTEUR_NO_HISTOGRAMMES
   server.on("/ajax_histo48h", handleAjaxHisto48h);
+#endif
   server.on("/ajax_histo1an", handleAjaxHisto1an);
   server.on("/ajax_dataRMS", handleAjaxRMS);
   server.on("/ajax_dataESP32", handleAjaxESP32);
   server.on("/ajax_data", handleAjaxData);
+#ifndef ROUTEUR_NO_HISTOGRAMMES
   server.on("/ajax_data10mn", handleAjaxData10mn);
+#endif
   server.on("/ajax_etatActions", handleAjax_etatActions);
   server.on("/ajax_etatActionX", handleAjax_etatActionX);
   server.on("/ForceAction", handleForceAction);
@@ -310,6 +314,7 @@ void handleAjaxRMS() {  // Envoi des dernières données  brutes reçues du RMS
     if (Source_data == "NotDef") {
       S += GS + " ";
     }
+#ifndef ROUTEUR_BUILD_LIGHT
     if (Source_data == "UxI") {
       S += RS + String(Tension_M) + RS + String(Intensite_M) + RS + String(PowerFactor_M) + GS;
       int i0 = 0;
@@ -399,19 +404,23 @@ void handleAjaxRMS() {  // Envoi des dernières données  brutes reçues du RMS
     if (Source_data == "ShellyEm" || Source_data == "ShellyPro") {
       S += GS + ShEm_dataBrute;
     }
+#endif
     if (Source_data == "Zendure") {
       S += GS + Zendure_dataBrute;
     }
+#ifndef ROUTEUR_BUILD_LIGHT
     if (Source_data == "UxIx3") {
       S += GS + MK333_dataBrute;
     }
     if (Source_data == "Pmqtt") {
       S += GS + P_MQTT_Brute;
     }
+#endif
   }
 
   server.send(200, "text/html", S);
 }
+#ifndef ROUTEUR_NO_HISTOGRAMMES
 void handleAjaxHisto48h() {  // Envoi Historique de 50h (600points) toutes les 5mn
   String S = "";
   String T = "";
@@ -450,6 +459,7 @@ void handleAjaxHisto48h() {  // Envoi Historique de 50h (600points) toutes les 5
 
   server.send(200, "text/html", Pmaxi + GS + S + GS + T + GS + U + Ouverture);
 }
+#endif
 void handleAjaxESP32() {  // Envoi des dernières infos sur l'ESP32
   IT10ms = 0;
   IT10ms_in = 0;
@@ -652,6 +662,7 @@ void handleRestart() {  // Eventuellement Reseter l'ESP32 à distance
   ReseT("Reset Demandé par le Web");
 }
 
+#ifndef ROUTEUR_NO_HISTOGRAMMES
 void handleAjaxData10mn() {  // Envoi Historique de 10mn (300points)Energie Active Soutiré - Injecté
   String S = "";
   String T = "";
@@ -677,6 +688,7 @@ void handleAjaxData10mn() {  // Envoi Historique de 10mn (300points)Energie Acti
 
   server.send(200, "text/html", Source_data + GS + S + GS + T + Ouverture);
 }
+#endif
 void handleAjaxNoms() {
   Liste_NomsEtats(0);  // Les noms de ce routeur
   String S = GS + RMS_NomEtat[0] + "\r";
@@ -767,7 +779,9 @@ void handleParaNew() {
   }
   if (EtatGpioFinal != EtatGpioInitial) InitGPIOs();
   // Recherche des Noms (routeurs, températures,actions) des RMS partenaires
+#ifndef ROUTEUR_BUILD_LIGHT
   IndexSource();
+#endif
   Liste_des_Noms();
 }
 
@@ -795,6 +809,7 @@ void handleParaFixe() {  //Paramètres stockés en fichier
 }
 void handleajaxRAZhisto() {
   RAZ_Histo_Conso();
+#ifndef ROUTEUR_NO_HISTOGRAMMES
   for (int i = 0; i < 600; i++) {
     tabPw_Maison_5mn[i] = 0;  // Puissance Active:Soutiré-Injecté toutes les 5mn
     tabPw_Triac_5mn[i] = 0;
@@ -814,6 +829,7 @@ void handleajaxRAZhisto() {
       tab_histo_2s_ouverture[j][i] = 0;
     }
   }
+#endif
   RAZ_JSY = true;
 
   server.send(200, "text/html", "OK");

@@ -1,3 +1,4 @@
+#ifndef ROUTEUR_BUILD_LIGHT
 // ***************************************************************
 // * Client d'un autre ESP32 en charge de mesurer les puissances *
 // ***************************************************************
@@ -208,3 +209,4 @@ void IndexSource() {
     }
   }
 }
+#endif

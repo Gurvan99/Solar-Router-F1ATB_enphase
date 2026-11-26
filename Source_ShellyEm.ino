@@ -1,3 +1,4 @@
+#ifndef ROUTEUR_BUILD_LIGHT
 // ****************************************************
 // * Client d'un Shelly Em sur voie 0 ou 1 ou triphasé*
 // ****************************************************
@@ -304,3 +305,4 @@ void LectureShellyEm() {
     cptLEDyellow = 4;
   }
 }
+#endif

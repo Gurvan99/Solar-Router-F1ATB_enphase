@@ -582,6 +582,7 @@ double EASfloat = 0;
 double EAIfloat = 0;
 
 int PactConso_M, PactProd;
+#ifndef ROUTEUR_NO_HISTOGRAMMES
 int16_t tabPw_Maison_5mn[600];  //Puissance Active:Soutiré-Injecté toutes les 5mn
 int16_t tabPw_Triac_5mn[600];
 int16_t tabTemperature_5mn[4][600];
@@ -593,6 +594,7 @@ int8_t tab_histo_ouverture[LES_ACTIONS_LENGTH][600];
 int8_t tab_histo_2s_ouverture[LES_ACTIONS_LENGTH][300];
 int16_t IdxStock2s = 0;
 int16_t IdxStockPW = 0;
+#endif
 float PmaxReseau = 36000;  //Puissance Max pour eviter des débordements
 bool LissageLong = false;
 bool Pva_valide = false;
@@ -628,20 +630,24 @@ byte pUxI = 0;
 byte Analog0[] = { 0, 35, 35, 34, 35 };
 byte Analog1[] = { 0, 32, 32, 32, 36 };
 byte Analog2[] = { 0, 33, 34, 33, 39 };
+#ifndef ROUTEUR_BUILD_LIGHT
 int value0;
 int volt[100];
 int amp[100];
+float voltM[100];   //Voltage Mean value
+float ampM[100];
+#endif
 float KV = 0.2083;  //Calibration coefficient for the voltage. Value for CalibU=1000 at startup
 float KI = 0.0642;  //Calibration coefficient for the current. Value for CalibI=1000 at startup
 float kV = 0.2083;  //Calibration coefficient for the voltage. Corrected value
 float kI = 0.0642;  //Calibration coefficient for the current. Corrected value
-float voltM[100];   //Voltage Mean value
-float ampM[100];
 
 //Parameters for JSY-MK-194T module
+#ifndef ROUTEUR_BUILD_LIGHT
 byte ByteArray[130];
 long LesDatas[14];
 int Sens_1, Sens_2;
+#endif
 bool RAZ_JSY = false;
 
 //Paramètres pour triphasé
@@ -649,7 +655,9 @@ float Tension_M1 = 0, Tension_M2 = 0, Tension_M3 = 0;
 float Intensite_M1 = 0, Intensite_M2 = 0, Intensite_M3 = 0;
 
 //Parameters for JSY-MK-333 module triphasé
+#ifndef ROUTEUR_BUILD_LIGHT
 String MK333_dataBrute = "";
+#endif
 
 //  ajout PhDV61 compteurs d'énergie quotidienne et totale soutirée et injectée JSY Mk 333
 float Energie_Minuit_JSY_Soutiree = 0.0;  // Le contenu sera initialisé au premier appel UxIx3 après Reset
@@ -695,7 +703,9 @@ long EASF09 = 0;
 long EASF10 = 0;
 
 //Paramètres for Enphase-Envoy-Smetered
+#ifndef ROUTEUR_BUILD_LIGHT
 String TokenEnphase = "";
+#endif
 String EnphaseUser = "";
 String EnphasePwd = "";
 String EnphaseSerial = "0";  //Sert égalemnet au Shelly comme numéro de voie
@@ -707,10 +717,13 @@ float PwBattery = 0;                 // Puissance délivrée par la batterie Zen
 bool ZendurePowerValide = false;
 float PwBatteryCharge = -1;         // Puissance de charge de la batterie Zendure (outputPackPower). -1 = invalide
 int BatteryStatus = -1;             // Etat de charge batterie Zendure en % (electricLevel). -1 = invalide
+#ifndef ROUTEUR_BUILD_LIGHT
 String EnvoySessionIdCookie = "";  // Cookie `sessionId` renvoyé par l'API Enphase Envoy pour les requêtes authentifiées, reutilisé pour accélerer les appels suivants (~25ms economisés par rapport a Bearer Token)
 unsigned long lastTokenUpdate = 0;  //interval de temps depuis dernier Token Enphase //SR19
+#endif
 
 
+#ifndef ROUTEUR_BUILD_LIGHT
 /** Structure pour calculer une moyenne pondérée des temps en millisecondes.
     Maintient la derniere valeur reçue et la moyenne pondérée.
     La moyenne est calculée avec un facteur alpha = 0.01, ce qui signifie que les nouvelles valeurs ont un poids de 1%.
@@ -747,29 +760,36 @@ unsigned long EnvoyCompteSuccesLectureComplete = 0;
 unsigned long EnvoyCompteErreurTimeout = 0;
 unsigned long EnvoyCompteErreurConnectionClosed = 0;
 unsigned long EnvoyCompteErreurEchecConnect = 0;
+#endif
 
 // Statistiques d'energie obtenues depuis l'Envoy, pour aff
+#ifndef ROUTEUR_BUILD_LIGHT
 long LastwhDlvdCum = 0;             //Dernière valeur cumul Wh Soutire.
 long LastwhRcvdCum = 0;             //Dernière valeur cumul Wh injecté
 float EMI_Wh = 0;                   //Energie entrée Maison Injecté Wh
 float EMS_Wh = 0;                   //Energie entrée Maison Soutirée Wh
+#endif
 
 //Paramètres for SmartGateways
+#ifndef ROUTEUR_BUILD_LIGHT
 String SG_dataBrute = "";
 
 //Paramètres for HomeWizard
 String HW_dataBrute = "";
+#endif
 
 //Paramètres for Zendure 3CT
 String Zendure_dataBrute = "";
 
 //Paramètres for Shelly Em
+#ifndef ROUTEUR_BUILD_LIGHT
 String ShEm_dataBrute = "";
 int ShEm_comptage_appels = 0;
 float PwMoy2 = 0;  //Moyenne voie secondsaire
 float pfMoy2 = 1;  //pf Voie secondaire
 String Shelly_Name = "";
 String Shelly_Profile = "";
+#endif
 
 //Paramètres pour puissance via MQTT
 String P_MQTT_Brute = "";
@@ -1065,6 +1085,26 @@ void WiFiEvent(WiFiEvent_t event, arduino_event_info_t info) {  //SR19 3.3.6+
   }           //SR19
 }    
 
+void DiagnosticPSRAM()
+{
+    Serial.println("=== Diagnostic PSRAM ===");
+
+    if (psramFound())
+    {
+        Serial.println("PSRAM detectee : OUI");
+
+        Serial.printf("PSRAM totale : %u octets\n", ESP.getPsramSize());
+        Serial.printf("PSRAM libre  : %u octets\n", ESP.getFreePsram());
+    }
+    else
+    {
+        Serial.println("PSRAM detectee : NON");
+    }
+
+    Serial.printf("Heap total libre : %u octets\n", ESP.getFreeHeap());
+    Serial.printf("Bloc max heap    : %u octets\n", ESP.getMaxAllocHeap());
+}
+
 // SETUP
 //*******
 void setup() {
@@ -1078,7 +1118,7 @@ void setup() {
   Serial.println();
   StockMessage("Booting Routeur F1ATB");
   Serial.println(Version);
-
+DiagnosticPSRAM();
   //Reset Reason
   Serial.println("\n--- ANALSE DU DERNIER BOOT ---");
   print_reset_reason();
@@ -1374,9 +1414,11 @@ void setup() {
   //Adaptation à la Source
   TelnetPrintln("Source : " + Source);
 
+#ifndef ROUTEUR_BUILD_LIGHT
   if (Source == "UxI") {
     Setup_UxI();
   }
+#endif
 
 #ifndef ROUTEUR_BUILD_LIGHT
   if (Source == "Enphase") {
@@ -1385,6 +1427,7 @@ void setup() {
 #endif
 
 
+#ifndef ROUTEUR_BUILD_LIGHT
   if (Source == "Pmqtt") {
     GestionMQTT();
   }
@@ -1396,11 +1439,9 @@ void setup() {
       Setup_UxIx2();
     }
 
-#ifndef ROUTEUR_BUILD_LIGHT
     if (Source == "Linky") {
       Setup_Linky();
     }
-#endif
   }
 
   if (Source == "Ext") {
@@ -1408,6 +1449,9 @@ void setup() {
   } else {
     Source_data = Source;
   }
+#else
+  Source_data = Source;
+#endif
   LireSerial();
 
 
@@ -1464,6 +1508,7 @@ void setup() {
 */
 void Task_LectureRMS(void *pvParameters) {
 
+#ifndef ROUTEUR_BUILD_LIGHT
   if (Source == "UxIx3") {
     Setup_JSY333();           // init port série
     delay(100);               // pour s'assurer que l'init du port série est ok coté module
@@ -1471,6 +1516,7 @@ void Task_LectureRMS(void *pvParameters) {
     Requete_JSY333();         // requête initiale au module. La première lecture aura lieu PeriodeProgMillis =1000ms plus tard.
                                // et les données seront déjà toutes dans le buffer de réception
   }
+#endif
   for (;;) {
     unsigned long tps = millis();
     float deltaT = float(tps - previousTimeRMS);
@@ -1493,6 +1539,7 @@ void Task_LectureRMS(void *pvParameters) {
         LectureNotDef();
         PeriodeProgMillis = 600;
       }
+#ifndef ROUTEUR_BUILD_LIGHT
       if (Source == "UxI") {
         LectureUxI();
         PeriodeProgMillis = 40;
@@ -1502,7 +1549,6 @@ void Task_LectureRMS(void *pvParameters) {
           LectureUxIx2();
           PeriodeProgMillis = 400;
         }
-#ifndef ROUTEUR_BUILD_LIGHT
         if (Source == "UxIx3") {
           Lecture_JSY333();
           PeriodeProgMillis = 800;
@@ -1512,8 +1558,8 @@ void Task_LectureRMS(void *pvParameters) {
           LectureLinky();
           PeriodeProgMillis = 2;
         }
-#endif
       }
+#endif
 #ifndef ROUTEUR_BUILD_LIGHT
       if (Source == "Enphase") {
         LectureEnphase();
@@ -1521,6 +1567,7 @@ void Task_LectureRMS(void *pvParameters) {
         PeriodeProgMillis = 300 + ralenti;  //On s'adapte à la vitesse réponse Envoy-S metered
       }
 #endif
+#ifndef ROUTEUR_BUILD_LIGHT
       if (Source == "SmartG") {
         LectureSmartG();
         LastRMS_Millis = millis();
@@ -1531,6 +1578,7 @@ void Task_LectureRMS(void *pvParameters) {
         LastRMS_Millis = millis();
         PeriodeProgMillis = 300 + ralenti;  //On s'adapte à la vitesse réponse HomeWizard
       }
+#endif
 #ifndef ROUTEUR_BUILD_LIGHT
       if (Source == "ShellyEm") {
         LectureShellyEm();
@@ -1549,6 +1597,7 @@ void Task_LectureRMS(void *pvParameters) {
         PeriodeProgMillis = 300 + ralenti;  //On adapte la vitesse pour ne pas surchargé Wifi
       }
 
+#ifndef ROUTEUR_BUILD_LIGHT
       if (Source == "Ext") {
         CallESP32_Externe();
         LastRMS_Millis = millis();
@@ -1559,6 +1608,7 @@ void Task_LectureRMS(void *pvParameters) {
         LastRMS_Millis = millis();
         UpdatePmqtt();
       }
+#endif
     }
     delay(2);
   }
@@ -1613,6 +1663,7 @@ void loop() {
 
     if (tps - previousHistoryMillis > 300000) {  //Historique consommation par pas de 5mn
       previousHistoryMillis += 300000;
+#ifndef ROUTEUR_NO_HISTOGRAMMES
       tabPw_Maison_5mn[IdxStockPW] = PuissanceS_M - PuissanceI_M;
       tabPw_Triac_5mn[IdxStockPW] = PuissanceS_T - PuissanceI_T;
       for (int c = 0; c < 4; c++) {
@@ -1632,6 +1683,7 @@ void loop() {
         }
       }
       IdxStockPW = (IdxStockPW + 1) % 600;
+#endif
 
       //Discovery message pour MQTT (if HA restart)
       Discovered = false;
@@ -1643,6 +1695,7 @@ void loop() {
     if (tps - previousTimer2sMillis > 2000) {
       unsigned long dt = tps - previousTimer2sMillis;
       previousTimer2sMillis = tps;
+#ifndef ROUTEUR_NO_HISTOGRAMMES
       tabPw_Maison_2s[IdxStock2s] = PuissanceS_M - PuissanceI_M;
       tabPw_Triac_2s[IdxStock2s] = PuissanceS_T - PuissanceI_T;
       tabPva_Maison_2s[IdxStock2s] = PVAS_M - PVAI_M;
@@ -1656,6 +1709,7 @@ void loop() {
       }
       
       IdxStock2s = (IdxStock2s + 1) % 300;
+#endif
       PuisMaxS_T = max(PuisMaxS_T, PuissanceS_T);
       PuisMaxS_M = max(PuisMaxS_M, PuissanceS_M);
       PuisMaxI_T = max(PuisMaxI_T, PuissanceI_T);

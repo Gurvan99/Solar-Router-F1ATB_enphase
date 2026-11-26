@@ -1,3 +1,4 @@
+#ifndef ROUTEUR_BUILD_LIGHT
 // ****************************
 // * Source de Mesures U et I *
 // *          UXI             *
@@ -96,3 +97,4 @@ void ComputePower() {
   EnergieActiveValide = true;
   PuissanceRecue = true;
 }
+#endif

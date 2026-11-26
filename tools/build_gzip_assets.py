@@ -41,6 +41,8 @@ ASSETS = [
 ]
 
 LIGHT_ASSETS = [
+    "MainJS2",
+    "MainJS3",
     "ParaJS1",
     "ParaJS2",
     "PageBruteJS1",

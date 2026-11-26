@@ -481,8 +481,7 @@ void DeserializeConfiguration(String json) {
   pTemp = conf["pTemp"];
   Source = conf["Source"].as<String>();
 #ifdef ROUTEUR_BUILD_LIGHT
-  if (Source == "Enphase" || Source == "Linky" || Source == "UxIx3" ||
-      Source == "ShellyEm" || Source == "ShellyPro") {
+  if (Source != "Zendure" && Source != "NotDef") {
     StockMessage("Source " + Source + " absente de cette compilation ; source remise à Non définie");
     Source = "NotDef";
   }

@@ -1,3 +1,4 @@
+#ifndef ROUTEUR_BUILD_LIGHT
 // ******************************
 // * Client d'un Smart Gateways *
 // ******************************
@@ -76,3 +77,4 @@ float ValJsonSG(String nom, String Json) {
   }
   return val;
 }
+#endif

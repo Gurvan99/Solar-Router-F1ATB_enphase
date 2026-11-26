@@ -1,3 +1,4 @@
+#ifndef ROUTEUR_BUILD_LIGHT
 // ****************************
 // * Source de Mesures LINKY  *
 // ****************************
@@ -274,3 +275,4 @@ void LectureLinky() {  //Lecture port série du LINKY .
     }
   }
 }
+#endif

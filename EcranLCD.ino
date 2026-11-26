@@ -11,12 +11,44 @@ LGFX* lcd = nullptr;
 CST820* touch = nullptr;  //Touch pour les écrans Capacitifs
 initGT911* touchGT911 = nullptr; //Touch pour les écrans Capacitifs GT911
 unsigned long runtime_0 = 0, runtime_click = 0, runtime_On = 0;
+#ifdef ROUTEUR_NO_HISTOGRAMMES
+int8_t NumPage = 0, NbrPage = 5;
+#else
 int8_t NumPage = 0, NbrPage = 7;
+#endif
 int16_t ClickX = 0, ClickY = 0, ClickCount = 0, LastClickX = 0, LastClickY = 0, slideX = 0;
 int LigneTotalOld, LigneTotal, LigneIdx;
 bool ReDraw = false, ScreenOn = true;
 int16_t ForceIPidx = 0, ForceIdx = 0, ForceOnOff = 0;
 int16_t idxDecalM = 0;
+
+int8_t PageLCDSuivante(int8_t page) {
+#ifdef ROUTEUR_NO_HISTOGRAMMES
+  switch (page) {
+    case 0: return 3;
+    case 3: return 4;
+    case 4: return 5;
+    case 5: return 6;
+    default: return 0;
+  }
+#else
+  return (page + 1 + NbrPage) % NbrPage;
+#endif
+}
+
+int8_t PageLCDPrecedente(int8_t page) {
+#ifdef ROUTEUR_NO_HISTOGRAMMES
+  switch (page) {
+    case 0: return 6;
+    case 6: return 5;
+    case 5: return 4;
+    case 4: return 3;
+    default: return 0;
+  }
+#else
+  return (page - 1 + NbrPage) % NbrPage;
+#endif
+}
 
 
 unsigned long CoulTexte, CoulFond, CoulBouton, CoulBoutFond, CoulBoutBord, CoulW, CoulWh, CoulTabTexte, CoulTabFond, CoulTabBord;
@@ -60,6 +92,9 @@ void Ecran_Init(byte ESP32type) {
     lcd->setTouchCalibrate(Calibre);  //Ancienne calibration ecran
   }
   NumPage = NumPageBoot;
+#ifdef ROUTEUR_NO_HISTOGRAMMES
+  if (NumPage == 1 || NumPage == 2) NumPage = 0;
+#endif
   ScreenOn = true;
   ReDraw = true;
   TraceMessages();
@@ -77,9 +112,11 @@ void Ecran_Loop() {
         case 0:
           AccueilLoop();
           break;
+#ifndef ROUTEUR_NO_HISTOGRAMMES
         case 1:
           GrapheTrace(10);
           break;
+#endif
         case 3:
           runtime_On = millis();  //Cas des messages de debug, on laisse allumé
           TraceMessages();
@@ -206,10 +243,10 @@ void Ecran_Loop() {
           }
           if (ClickCount > 1 && abs(ClickX - LastClickX) > 30) {  // Déplacement horizontal du doigt
             if (ClickX < LastClickX) {
-              NumPage = (NumPage + 1 + NbrPage) % NbrPage;
+              NumPage = PageLCDSuivante(NumPage);
               slideX = 40 - lcd->width();  //Masque par la droite
             } else {
-              NumPage = (NumPage - 1 + NbrPage) % NbrPage;
+              NumPage = PageLCDPrecedente(NumPage);
               slideX = 40;
             }
             ClickCount = 0;
@@ -316,12 +353,14 @@ void GoPage(int N) {
       case 0:
         AccueilTrace();
         break;
+#ifndef ROUTEUR_NO_HISTOGRAMMES
       case 1:
         GrapheTrace(10);
         break;
       case 2:
         GrapheTrace(48);
         break;
+#endif
       case 3:
         TraceMessages();
         break;
@@ -665,6 +704,7 @@ void AccueilCadrage(int& WE, int& HE, int& W, int& H, int& Hconso, int& H1, int&
   if (LigneTotal != LigneTotalOld) ReDraw = true;
   LigneTotalOld = LigneTotal;
 }
+#ifndef ROUTEUR_NO_HISTOGRAMMES
 void GrapheTrace(int8_t gr) {
   int WE = lcd->width();
   int HE = lcd->height();
@@ -754,6 +794,7 @@ void GrapheTrace(int8_t gr) {
   TraceDate();
   TraceTarif();
 }
+#endif
 
 
 

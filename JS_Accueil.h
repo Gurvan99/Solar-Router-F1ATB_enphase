@@ -3,6 +3,9 @@
 //**********************************************
 const char * MainJS1 = R"====(
 // NOTA: La variable biSonde est déclarée au chargement du fichier par le serveur pour être dispo immédiatement
+)===="
+#ifndef ROUTEUR_NO_HISTOGRAMMES
+R"====(
 let tabPW2sM = [];
 let tabPW2sT = [];
 let tabActOuvre = [];
@@ -11,6 +14,9 @@ let LastPVA_M = 0;
 let LastPW_T = 0;
 let LastPVA_T = 0;
 let LastActOuvre = [];
+)===="
+#endif
+R"====(
 let PuisMaxS_M = 0;
 let PuisMaxI_M = 0;
 let PuisMaxS_T = 0;
@@ -76,8 +82,14 @@ async function LoadData() {
         GID('PMI_M').innerHTML = LaVal(PuisMaxI_M);
 
      
+)===="
+#ifndef ROUTEUR_NO_HISTOGRAMMES
+R"====(
         LastPW_M = parseFloat(G1[0]) - parseFloat(G1[1]);
         LastPVA_M = parseFloat(G1[2]) - parseFloat(G1[3]);
+)===="
+#endif
+R"====(
 
         // Logique Tarif
         const Tarif = ["NON_DEFINI", "PLEINE", "CREUSE", "BLEU", "BLANC", "ROUGE"];
@@ -136,8 +148,14 @@ async function LoadData() {
             GID('PMS_T').innerHTML = LaVal(PuisMaxS_T);
             GID('PMI_T').innerHTML = LaVal(PuisMaxI_T);
 
+)===="
+#ifndef ROUTEUR_NO_HISTOGRAMMES
+R"====(
             LastPW_T = parseFloat(G2[0]) - parseFloat(G2[1]);
             LastPVA_T = parseFloat(G2[2]) - parseFloat(G2[3]);
+)===="
+#endif
+R"====(
         }
 
         AdaptationSource();
@@ -165,6 +183,9 @@ async function LoadData() {
     }
 }
 
+)===="
+#ifndef ROUTEUR_NO_HISTOGRAMMES
+R"====(
 // Fonction pour charger l'historique 10 minutes
 async function LoadHisto10mn() {
     try {
@@ -292,6 +313,9 @@ async function LoadHisto48h() {
         setTimeout(LoadHisto48h, REFRESH_INTERVAL_48H); 
     }
 }
+)===="
+#endif
+R"====(
 
 // Fonction pour charger l'historique 1 an
 async function LoadHisto1an() {
@@ -316,9 +340,15 @@ async function LoadHisto1an() {
             lastDay=ValJour[0];
             tabJourWh[j]=ValJour.slice(0,5); //Date + Souti+Inject+Conso+Produit          
         }
-        if (Graphes_Select[10]) PlotWhJour(tabJourWh);
+        if (Graphes_Select[INDEX_GRAPHE_ANNUEL]) PlotWhJour(tabJourWh);
+)===="
+#ifndef ROUTEUR_NO_HISTOGRAMMES
+R"====(
         // Passe à l'étape suivante
         await LoadHisto48h();
+)===="
+#endif
+R"====(
 
     } catch (error) {
         console.error("Erreur LoadHisto1an:", error);
@@ -327,10 +357,18 @@ async function LoadHisto1an() {
 )====";
 
 // MainJS2: served gzip-compressed (see web_assets/MainJS2.js + tools/build_gzip_assets.py). Content-Encoding: gzip is set in Server.ino.
+#ifdef ROUTEUR_NO_HISTOGRAMMES
+#include "web_assets/generated/MainJS2_light_gz.h"
+#else
 #include "web_assets/generated/MainJS2_gz.h"
+#endif
 
 // MainJS3: served gzip-compressed (see web_assets/MainJS3.js + tools/build_gzip_assets.py). Content-Encoding: gzip is set in Server.ino.
+#ifdef ROUTEUR_NO_HISTOGRAMMES
+#include "web_assets/generated/MainJS3_light_gz.h"
+#else
 #include "web_assets/generated/MainJS3_gz.h"
+#endif
 // icône panneaux solaire et soleil (Merci michy)
 const char * Favicon = R"====(
 <svg xmlns = "http://www.w3.org/2000/svg" width = "64" height = "64" viewBox = "13 18 46 44" >
